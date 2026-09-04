@@ -44,4 +44,3 @@ Block diagram of the ALU module:
 # IC HARDWARE LOGIC
 
 ![[Pasted image 20260904205806.png|545]]
-
