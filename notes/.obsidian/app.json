@@ -8,6 +8,6 @@
   "openBehavior": "",
   "newFileFolderPath": "",
   "useMarkdownLinks": true,
-  "newLinkFormat": "relative",
+  "newLinkFormat": "absolute",
   "showUnsupportedFiles": false
 }

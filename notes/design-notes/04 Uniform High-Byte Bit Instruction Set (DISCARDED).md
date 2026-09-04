@@ -9,11 +9,8 @@ For the IRLB (bits 0-7), normally they are all connected to the data bus with a 
 
 The connections are as following:
 
-![Instruction Register|421](Attachments/(DISCARDED)ins_set.png)
-
-
+![Instruction Set](notes/Attachments/(DISCARDED)ins_set.png)
 # TABLE OF INSTRUCTION CLASSES & BIT ENCODING
-
 
 | Instruction class                         | Opcode [15:11] | Rdst [10:8]            | Rsrc [7:5]  | Imm [7:0]      |
 | ----------------------------------------- | -------------- | ---------------------- | ----------- | -------------- |

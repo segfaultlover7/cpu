@@ -1,1 +1,0 @@
-When thinking about the [[Instruction set]]

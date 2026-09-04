@@ -28,4 +28,4 @@ The way these bits are allocated is the following:
 
 As seen in the table, the bit encoding is really similar to [[04 Uniform High-Byte Bit Instruction Set (DISCARDED)]], but the change on the no-operand instructions is 
 what gives 8 extra sub-instructions per instruction.
-Instruction set: [[Instruction set]] 
+Instruction set: [[../opcodes&microinstructions/Instruction set]] 
