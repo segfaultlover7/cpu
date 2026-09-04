@@ -1,1 +1,1 @@
-![Memory Map](notes/Attachments/mmap.png)
+![Memory Map](../Attachments/mmap.png)

@@ -8,7 +8,7 @@ The rest of the IRHB (bits 11-15) are connected to the control unit. This bits a
 For the IRLB (bits 0-7), normally they are all connected to the data bus with a buffer in between, which is activated when an immediate value is needed somewhere in the CPU, however, the last 3 bits (bits 5-7) are also hardwired into the register file to the register source bits.
 
 The connections are as following:
-![507](notes/Attachments/(DISCARDED)ins_dp.png)
+![(DISCARDED) Instruction Datapath|474](../Attachments/(DISCARDED)ins_dp.png)
 
 # TABLE OF INSTRUCTION CLASSES & BIT ENCODING
 

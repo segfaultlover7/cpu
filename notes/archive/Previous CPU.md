@@ -15,7 +15,7 @@ One of the main issues this design has is that only having 4 general purpose reg
 This is related to the [[../design-notes/03 Fetch-Execute Overlap]]. This change felt natural just by seeing the amount of cycles that could be saved by making this change. 
 ## Design made in Digital
 
-![Previous CPU](notes/Attachments/oldcpu.png)
+![Previous CPU|633](../Attachments/oldcpu.png)
 
 *Note that at the top right part, the SCREEN, is not how the actual OLED screen of the new design works, but since this was the only one available in the simulator, the connections had to be done that way.*
 
