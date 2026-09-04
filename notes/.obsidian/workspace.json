@@ -13,22 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "03_Modules/M-01 ALU.md",
+                "file": "hardware design/RegisterFile.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "M-01 ALU"
-            }
-          },
-          {
-            "id": "0b4453d4aa37c625",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "title": "RegisterFile"
             }
           }
         ]
@@ -200,27 +190,33 @@
   },
   "active": "e8dedf33316f8c9d",
   "lastOpenFiles": [
-    "Attachments/Pasted image 20260904205806.png",
-    "Attachments/Pasted image 20260904181545.png",
+    "hardware design/ALU.md",
+    "design notes/04 Uniform High-Byte Bit Instruction Set (DISCARDED).md",
+    "design notes/05 Orthogonal Fixed Encoding with Opcode Extension.md",
+    "design notes/06 Registers X and Y INC arithmetic.md",
+    "opcodes & microinstructions/Instruction set.md",
+    "hardware design/RegisterFile.md",
+    "ideas.md",
+    "hardware design/ProgramCounter.md",
+    "Attachments/rfile.png",
+    "design notes/07 Latch-less ALU datapath.md",
+    "Attachments/memorymapv1.drawio.png",
+    "Attachments/(DISCARDED)ins_set.png",
+    "Attachments/alu_abs.png",
+    "Attachments/alu_ics.png",
+    "Attachments/oldcpu.png",
     "Attachments/Pasted image 20260904140613.png",
     "Attachments/Pasted image 20260904140546.png",
-    "Attachments/Pasted image 20260903205937.png",
-    "Attachments/Pasted image 20260903205849.png",
-    "Attachments/Pasted image 20260903200833.png",
-    "Attachments/Pasted image 20260903200650.png",
     "Attachments/Pasted image 20260903200248.png",
-    "Attachments/Pasted image 20260903191554.png",
+    "design notes/03 Fetch-Execute Overlap.md",
+    "Attachments/Pasted image 20260903205937.png",
+    "archive/Memory Map.md",
+    "archive/New Model.md",
+    "archive/SO-02 Definitions.md",
+    "archive/Previous CPU.md",
+    "design notes/02 Microstep Counter Reduction.md",
+    "design notes/01 Register File Increment.md",
     "Attachments",
-    "02_ISA&Microcode/Instruction set.md",
-    "01_ArchitecturalDecisions/AD-07 Latch-less ALU datapath.md",
-    "01_ArchitecturalDecisions/AD-06 Registers X and Y INC arithmetic.md",
-    "01_ArchitecturalDecisions/AD-05 Orthogonal Fixed Encoding with Opcode Extension.md",
-    "01_ArchitecturalDecisions/AD-04 Uniform High-Byte Bit Instruction Set (DISCARDED).md",
-    "01_ArchitecturalDecisions/AD-03 Fetch-Execute Overlap.md",
-    "01_ArchitecturalDecisions/AD-02 Microstep Counter Reduction.md",
-    "01_ArchitecturalDecisions/AD-01 Register File Increment.md",
-    "00_SystemOverview/SO-01 New Model.md",
-    "03_Modules/M-03 Program Counter.md",
-    "00_SystemOverview/SO-02 Definitions.md"
+    "attachments"
   ]
 }

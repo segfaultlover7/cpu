@@ -26,6 +26,6 @@ The way these bits are allocated is the following:
 | **Conditional Jump** <br>`JZ 0x80`        | 5-bit Op      | Conditional Code (0-7) | (ignored)   | Target address |
 | **No-operand** <br>`NOP, HALT`            | 8-bit Op      | (ignored)              | (ignored)   | (ignored)      |
 
-As seen in the table, the bit encoding is really similar to [[AD-04 Uniform High-Byte Bit Instruction Set (DISCARDED)]], but the change on the no-operand instructions is 
+As seen in the table, the bit encoding is really similar to [[04 Uniform High-Byte Bit Instruction Set (DISCARDED)]], but the change on the no-operand instructions is 
 what gives 8 extra sub-instructions per instruction.
 Instruction set: [[Instruction set]] 

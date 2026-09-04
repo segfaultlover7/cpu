@@ -1,4 +1,4 @@
-The first change I immediately though of when programming on the first design of the CPU was that 4 general purpose registers was not enough. Since I learned assembly on AVR, in which I had 32 GPRs, I was used to having a large amount of them, and suddenly having 4 felt like it wasn't enough.
+The first change I immediately though of when programming on the first design of the CPU was that 4 general purpose registers was not enough.
 
 Not only the problem was the commodity of using few registers, but this also caused me to constantly be accessing the RAM, which is far slower in terms of cycles than using the GPRs.
 

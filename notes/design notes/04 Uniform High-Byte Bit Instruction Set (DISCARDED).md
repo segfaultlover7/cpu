@@ -10,7 +10,7 @@ For the IRLB (bits 0-7), normally they are all connected to the data bus with a 
 The connections are as following:
 
 
-![[Pasted image 20260903200833.png|486]]
+![[(DISCARDED)ins_set.png|486]]
 
 # TABLE OF INSTRUCTION CLASSES & BIT ENCODING
 
@@ -28,4 +28,4 @@ The problem with this approach is that, only having 32 instructions was a major 
 
 When making the previous table, I realized that, if I connected all 8 bits of IRHB to the opcode, while using the same bit connection as before, I could make use of those instructions that ignore the destination and IRLB (No-operand instructions).
 
-That's why, the next Instruction set: [[AD-05 Orthogonal Fixed Encoding with Opcode Extension]] was needed in order to have all of the instructions I need.
+That's why, the next Instruction set: [[05 Orthogonal Fixed Encoding with Opcode Extension]] was needed in order to have all of the instructions I need.

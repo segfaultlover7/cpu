@@ -1,0 +1,8 @@
+{
+  "userIgnoreFilters": [
+    "Attachments/"
+  ],
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "current",
+  "attachmentFolderPath": "Attachments"
+}
