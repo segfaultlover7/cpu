@@ -1,1 +1,0 @@
-- fix images with html format for size "<img src="../Attachments/" alt="" width="" />"
