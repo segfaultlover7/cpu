@@ -3,8 +3,8 @@ Since this is an accumulator-based architecture, I want to start with the Arithm
 
 Block diagram of the ALU module:
 
-![ALU Block Diagram|502](../Attachments/alu_abs.png)
-*TO BE CHANGED (ROR NOT NEEDED)*
+<img src="../Attachments/alu_abs.png" alt="ALU Block Diagram" width="500" />
+
 - Input A: Hardwired directly to the output of the accumulator
 - Input B: Connected to the data bus
 - Output path: Connected to the second input of a mux for the input of the accumulator and also connected to a buffer that outputs to the data bus.
@@ -42,6 +42,6 @@ Block diagram of the ALU module:
 | C    | Carry    | Carry-out pin of MSB adder stage  | $C = C_{out7}$                                    |
 | N    | Negative | Most Significant Bit of result    | $N = Y_7$                                         |
 | V    | Overflow | Overflow pin of MSB adder stage   | $V = V_{7}$                                       |
-# IC HARDWARE LOGIC
+# ICs HARDWARE LOGIC
 
-![ALU ICs](../Attachments/alu_ics.png)
+<img src="../Attachments/alu_ics.png" alt="ALU ICs" width="600" />

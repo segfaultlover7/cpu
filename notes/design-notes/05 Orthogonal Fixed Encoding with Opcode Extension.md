@@ -14,7 +14,7 @@ The way these bits are allocated is the following:
 - Bits `[7:5]`  --> Source Register Select (Rsrc)
 - Bits `[7:0]`  --> Immediate 8-bit data
 
-![[Pasted image 20260903205937.png|353]]
+<img src="../Attachments/instdec.png" alt="Instruction Decoding" width="500" />
 
 # TABLE OF INSTRUCTION CLASSES & BIT ENCODING
 
