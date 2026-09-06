@@ -1414,6 +1414,20 @@
       <elementName>Out</elementName>
       <elementAttributes>
         <entry>
+          <string>rotation</string>
+          <rotation rotation="2"/>
+        </entry>
+        <entry>
+          <string>Label</string>
+          <string>[8]</string>
+        </entry>
+      </elementAttributes>
+      <pos x="720" y="700"/>
+    </visualElement>
+    <visualElement>
+      <elementName>Out</elementName>
+      <elementAttributes>
+        <entry>
           <string>Label</string>
           <string>[7:5]</string>
         </entry>
@@ -1423,20 +1437,6 @@
         </entry>
       </elementAttributes>
       <pos x="860" y="960"/>
-    </visualElement>
-    <visualElement>
-      <elementName>Out</elementName>
-      <elementAttributes>
-        <entry>
-          <string>Label</string>
-          <string>[0:7]</string>
-        </entry>
-        <entry>
-          <string>Bits</string>
-          <int>8</int>
-        </entry>
-      </elementAttributes>
-      <pos x="1040" y="960"/>
     </visualElement>
     <visualElement>
       <elementName>In</elementName>
@@ -1449,16 +1449,6 @@
       <pos x="540" y="860"/>
     </visualElement>
     <visualElement>
-      <elementName>In</elementName>
-      <elementAttributes>
-        <entry>
-          <string>Label</string>
-          <string>nIRAB_OE</string>
-        </entry>
-      </elementAttributes>
-      <pos x="540" y="900"/>
-    </visualElement>
-    <visualElement>
       <elementName>Tunnel</elementName>
       <elementAttributes>
         <entry>
@@ -1467,16 +1457,6 @@
         </entry>
       </elementAttributes>
       <pos x="560" y="860"/>
-    </visualElement>
-    <visualElement>
-      <elementName>Tunnel</elementName>
-      <elementAttributes>
-        <entry>
-          <string>NetName</string>
-          <string>IRLBAB_OE</string>
-        </entry>
-      </elementAttributes>
-      <pos x="560" y="900"/>
     </visualElement>
     <visualElement>
       <elementName>Tunnel</elementName>
@@ -1496,7 +1476,7 @@
           <string>CLK</string>
         </entry>
       </elementAttributes>
-      <pos x="540" y="960"/>
+      <pos x="540" y="940"/>
     </visualElement>
     <visualElement>
       <elementName>Tunnel</elementName>
@@ -1506,7 +1486,7 @@
           <string>CLK</string>
         </entry>
       </elementAttributes>
-      <pos x="560" y="960"/>
+      <pos x="560" y="940"/>
     </visualElement>
     <visualElement>
       <elementName>Splitter</elementName>
@@ -1568,6 +1548,34 @@
       </elementAttributes>
       <pos x="800" y="880"/>
     </visualElement>
+    <visualElement>
+      <elementName>Out</elementName>
+      <elementAttributes>
+        <entry>
+          <string>Label</string>
+          <string>[0:7]</string>
+        </entry>
+        <entry>
+          <string>Bits</string>
+          <int>8</int>
+        </entry>
+      </elementAttributes>
+      <pos x="1040" y="960"/>
+    </visualElement>
+    <visualElement>
+      <elementName>Tunnel</elementName>
+      <elementAttributes>
+        <entry>
+          <string>rotation</string>
+          <rotation rotation="1"/>
+        </entry>
+        <entry>
+          <string>NetName</string>
+          <string>I8</string>
+        </entry>
+      </elementAttributes>
+      <pos x="740" y="620"/>
+    </visualElement>
   </visualElements>
   <wires>
     <wire>
@@ -1579,20 +1587,16 @@
       <p2 x="860" y="960"/>
     </wire>
     <wire>
-      <p1 x="540" y="960"/>
-      <p2 x="560" y="960"/>
-    </wire>
-    <wire>
       <p1 x="540" y="820"/>
       <p2 x="560" y="820"/>
     </wire>
     <wire>
-      <p1 x="540" y="900"/>
-      <p2 x="560" y="900"/>
-    </wire>
-    <wire>
       <p1 x="880" y="120"/>
       <p2 x="940" y="120"/>
+    </wire>
+    <wire>
+      <p1 x="540" y="940"/>
+      <p2 x="560" y="940"/>
     </wire>
     <wire>
       <p1 x="540" y="860"/>
@@ -1605,6 +1609,10 @@
     <wire>
       <p1 x="620" y="700"/>
       <p2 x="640" y="700"/>
+    </wire>
+    <wire>
+      <p1 x="720" y="700"/>
+      <p2 x="740" y="700"/>
     </wire>
     <wire>
       <p1 x="640" y="180"/>
@@ -1849,6 +1857,10 @@
     <wire>
       <p1 x="740" y="180"/>
       <p2 x="740" y="200"/>
+    </wire>
+    <wire>
+      <p1 x="740" y="620"/>
+      <p2 x="740" y="700"/>
     </wire>
     <wire>
       <p1 x="420" y="480"/>

@@ -1,29 +1,29 @@
 # INSTRUCTION SET
 
 Cycles represent the "steps" in the micro-program counter. Since every time it resets, it goes to 0, cycles start at 0. These cycle is exactly the same in every single instruction, since it only fetches the data from the ROM to the instruction register safely.
-###  $00 --> MOV A, $imm8
+###  $01 --> MOV A, $imm8
 
 | Cycle | Control bits                       |
 | ----- | ---------------------------------- |
-| 0     | nPC_OE, MEM_RD, nIR_LD             |
+| 0     | MEM_RD, nIR_LD                     |
 | 1     | PC_INC, nIRDB_OE, REG_LD, nMPC_RST |
-### $01 --> MOV $reg, $reg
+### $02 --> MOV $reg, $reg
 
 Works with the accumulator implicitely.
 
 | Cycle | Control bits                     |
 | ----- | -------------------------------- |
-| 0     | nPC_OE, MEM_RD, nIR_LD           |
+| 0     | MEM_RD, nIR_LD                   |
 | 1     | PC_INC, REG_LD, REG_OE, nMPC_RST |
-### $02 --> MOV MARL/MARH, $imm8
+### $03 --> MOV MARL/MARH, $imm8
 
 When programming, the assembler will read the format, if it's MARL, the bit 8 of the instruction register which points to the selector of the MAR will be a 0. If it's MARH, the bit will be 1.
 
 | Cycle | Control bits                        |
 | ----- | ----------------------------------- |
-| 0     | nPC_OE, MEM_RD, nIR_LD              |
+| 0     | MEM_RD, nIR_LD                      |
 | 1     | PC_INC, nIRDB_OE, nMAR_LD, nMPC_RST |
-### $03 --> MOV MARL/MARH, $reg
+### $04 --> MOV MARL/MARH, $reg
 
 
 4 ld reg, zp(8) 
@@ -53,8 +53,8 @@ When programming, the assembler will read the format, if it's MARL, the bit 8 of
 26 cpi A, imm
 30 jcc mar (jmp will be 111 decode condition)
 31 call mar
-32 SYSCALLS
-32.1 nop
+32 zero-operand instructions
+32.1 brk (nop is add a, a as a pseudoinstruction)
 32.2 pushf
 32.3 popf
 32.4 ret
