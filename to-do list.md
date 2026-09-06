@@ -3,3 +3,4 @@
 - fix the 'and' row of the table alu core
 - improve the instruction set document
 - finish the program counter file1
+- fix mar, select for high or low is via hardware not from control unit

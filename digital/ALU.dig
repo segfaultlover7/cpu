@@ -2200,7 +2200,7 @@
       <elementAttributes>
         <entry>
           <string>Label</string>
-          <string>ALU_OE</string>
+          <string>nALU_OE</string>
         </entry>
       </elementAttributes>
       <pos x="-260" y="920"/>
@@ -2250,7 +2250,7 @@
       <elementAttributes>
         <entry>
           <string>Label</string>
-          <string>SHR</string>
+          <string>nSHR</string>
         </entry>
       </elementAttributes>
       <pos x="-260" y="960"/>
