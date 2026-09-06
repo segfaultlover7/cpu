@@ -42,6 +42,9 @@ nSP_INC  = 31  # increment the SP register
 
 SP_DIR   = 32  # 0 = INC, 1 = DEC
 nSP_LD   = 33  # load data from the address bus to the sp
+nSP_OE   = 34  # output SP to the address bus
+nSPL_OE  = 35  # output SPL to the data bus
+nSPH_OE  = 36  # output SPH to the data bus
 
 
 # active low mask:
@@ -52,7 +55,8 @@ active_low_mask = (
     (1 << nMPC_RST) | (1 << nMAR_LD)  | (1 << nMAR_OE)   |
     (1 << nALU_OE)  | (1 << nSHR_OE)  | (1 << nFL_OE)    |
     (1 << nFL_LD)   | (1 << nSEI)     | (1 << nCLI)      |
-    (1 << nSP_INC)  | (1 << nSP_LD)
+    (1 << nSP_INC)  | (1 << nSP_LD)   | (1 << nSP_OE)    |
+    (1 << nSPL_OE)  | (1 << nSPH_OE)
 )
 
 # generating the microcode for the eproms

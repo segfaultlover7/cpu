@@ -1,100 +1,24 @@
+# ADDRESS DECODER
 
-!write myself!
+The address decoder is a module which (as the name says) decodes the chip selects of each memory module. In order to understand it work, let's see the memory map of the CPU, which will clarify what it actually does:
+
+| Address Range   | Size  | Module                             | Active Signal |
+| --------------- | ----- | ---------------------------------- | ------------- |
+| `0x0000-0xBFFF` | 48 KB | RAM, stack & zero page             | `\RAM_CS`     |
+| `0xC000-0xFBFF` | 15 KB | Firmware ROM                       | `\ROM_CS`     |
+| `0xFC00-0xFEFF` | 1 KB  | OLED Framebuffer                   | `\FB_CS`      |
+| `0xFF00-0xFFFF` | 256 B | MMIO registers & Interrupt vectors | `\MMIO_CS`    |
+It's only job is to make sure that, when the address is on each address range, the specific active signal of each memory module activates, which since it's active low, goes to zero.
+
 ## Decoder Schematic Connections
 
-### 1. 74LS139 (Dual 2-to-4 Decoder)
+(this is more useful to me so that i don't forget what i did)
 
-**Half 1: Top-Level 16K Split**
+<img src="../Attachments/addec.png" alt="Address decoder" width="500" />
 
-- **1B (Pin 3):** `A15`
-    
-- **1A (Pin 2):** `A14`
-    
-- **1G (Pin 1):** `GND`
-    
-- **1Y3 (Pin 4):** Active-LOW upper 16 KB detect (`0xC000–0xFFFF`). Drives `74LS00` Pins 1 & 2 and `74LS138` Pin 4.
-    
+First of all, there is a 74139 dual 2-to-4 decoder, which has as inputs A15 and A14, meaning that I divide the memory into 4 16KB blocks.
 
-**Half 2: Top 1 KB Peripheral Split**
+Out of these 4, only the last one I need, because that's the upper 16KB, which differenciates between ROM and RAM.
 
-- **2B (Pin 13):** `A9`
-    
-- **2A (Pin 14):** `A8`
-    
-- **2G (Pin 15):** `\PERIPHERAL_1KB_CS` (From `74LS138` Pin 7)
-    
-- **2Y0..2Y2 (Pins 12, 11, 10):** Unused
-    
-- **2Y3 (Pin 9):** `\MMIO_CS` (`0xFF00–0xFFFF`)
-    
-
-### 2. 74LS138 (3-to-8 Decoder — Top 1 KB Isolation)
-
-- **A (Pin 1):** `A11`
-    
-- **B (Pin 2):** `A12`
-    
-- **C (Pin 3):** `A13`
-    
-- **\G2A (Pin 4):** `1Y3` (From `74LS139` Pin 4)
-    
-- **\G2B (Pin 5):** `GND`
-    
-- **G1 (Pin 6):** `A10` _(Active-HIGH enable; isolates 0xFC00–0xFFFF from 0xF800)_
-    
-- **Y7 (Pin 7):** `\PERIPHERAL_1KB_CS` (`0xFC00–0xFFFF`)
-    
-
-### 3. 74LS00 (Quad NAND Gate)
-
-- **Gate 1 (RAM Select Inverter):**
-    
-    - **Input Pins 1 & 2:** Connected together to `74LS139 1Y3` (Pin 4)
-        
-    - **Output Pin 3:** `\RAM_CS` (`0x0000–0xBFFF`)
-        
-- **Gate 2 (ROM Select):**
-    
-    - **Input Pin 4:** `\RAM_CS` (From Pin 3)
-        
-    - **Input Pin 5:** `\PERIPHERAL_1KB_CS` (From `74LS138` Pin 7)
-        
-    - **Output Pin 6:** `\ROM_CS` (`0xC000–0xFBFF`)
-        
-- **Gate 3 (Peripheral Inverter):**
-    
-    - **Input Pins 9 & 10:** Connected together to `\PERIPHERAL_1KB_CS` (From `74LS138` Pin 7)
-        
-    - **Output Pin 8:** `PERIPHERAL_HIGH`
-        
-- **Gate 4 (Framebuffer Select):**
-    
-    - **Input Pin 12:** `PERIPHERAL_HIGH` (From Pin 8)
-        
-    - **Input Pin 13:** `\MMIO_CS` (From `74LS139` Pin 9)
-        
-    - **Output Pin 11:** `\FB_CS` (`0xFC00–0xFEFF`)
-        
-
-## Signal Logic Equations
-
-- $\text{\RAM\_CS} = \text{NOT}(A_{15} \cdot A_{14})$
-    
-- $\text{\PERIPHERAL\_1KB\_CS} = A_{15} \cdot A_{14} \cdot A_{13} \cdot A_{12} \cdot A_{11} \cdot A_{10}$
-    
-- $\text{\ROM\_CS} = \text{NAND}(\text{\RAM\_CS}, \text{\PERIPHERAL\_1KB\_CS})$
-    
-- $\text{\MMIO\_CS} = \text{\PERIPHERAL\_1KB\_CS} \text{ AND } (A_9 \cdot A_8)$
-    
-- $\text{\FB\_CS} = \text{NAND}(\text{NOT}(\text{\PERIPHERAL\_1KB\_CS}), \text{\MMIO\_CS})$
-    
-
-## Hardware Verification Steps
-
-1. **RAM Verification:** Assert address `0x0000` through `0xBFFF`. Verify `\RAM_CS` drops to LOW (0V) while `\ROM_CS`, `\FB_CS`, and `\MMIO_CS` remain HIGH (5V).
-    
-2. **ROM Verification:** Assert address `0xC000` through `0xFBFF`. Verify `\ROM_CS` drops to LOW (0V).
-    
-3. **Boundary Verification:** Assert address `0xF800`. Verify `\FB_CS` remains HIGH (5V) and drops to LOW (0V) only when incrementing to `0xFC00`.
-    
-4. **MMIO Verification:** Assert address `0xFF00` through `0xFFFF`. Verify `\MMIO_CS` drops to LOW (0V) while `\FB_CS` returns to HIGH (5V).
+The other half of the 74139 is used with the addresses A9 and A8, and this is because it decodes into 4 256 B blocks, whose last output (2Y3) is exactly the
+`nMMIO_CS` bit. It's the last, because its selector ONLY activates when address bits A15, A14, A13 and A12 are one, so it decodes perfectly as `0xFF00`.
