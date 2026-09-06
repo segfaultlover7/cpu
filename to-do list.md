@@ -1,0 +1,5 @@
+- rewrite the instruction decoding to make it easier to understand
+- make a block diagram of the register file (if possible)
+- fix the 'and' row of the table alu core
+- improve the instruction set document
+- finish the program counter file1

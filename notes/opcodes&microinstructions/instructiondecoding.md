@@ -16,7 +16,7 @@ Also, this usage of 3 bits for the destination is done for the source, but on bi
 
 The way these bits are allocated is the following:
 
-- Bits `[15:11]` --> Base Opcode
+- Bits `[15:11]`--> Base Opcode
 - Bits `[15:8]` --> Entire Opcode (for subinstructions)
 - Bits `[10:8]` --> Destination Register Select (Rdst)
 - Bits `[7:5]`  --> Source Register Select (Rsrc)

@@ -23,7 +23,7 @@ Block diagram of the ALU module:
 | SBC         | 0   | 1   | 0   | `C_FLAG` | $A-B-1+C$          |
 | INC A       | 0   | 1   | 1   | 1        | $A+0+1$            |
 | DEC A       | 0   | 1   | 0   | 0        | $A-0-1$            |
-| AND/ANI     | 1   | 1   | 0   | X        | $A\&B$             |
+| AND/ANI     | 1   | 1   | 0   | X        | $A \& B$           |
 | OR          | 1   | 0   | 1   | X        | $A \| B$           |
 | XOR         | 1   | 0   | 0   | X        | $A\oplus B$        |
 ### Datapath Routing & Peripheral Control

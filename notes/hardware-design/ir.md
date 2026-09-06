@@ -1,0 +1,5 @@
+# INSTRUCTION REGISTER
+
+
+
+## Control bits

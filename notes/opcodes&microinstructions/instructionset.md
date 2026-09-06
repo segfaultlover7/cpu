@@ -1,10 +1,14 @@
+# INSTRUCTION SET
+
 1 mov A, imm
 2 mov reg , reg (works with A both ways)
 3 mov mar, reg (select l or h with bit 8)
-4 ld reg, mar(16)
-5 ld reg, XY
-6 st mar(16), reg
-7 st XY, reg
+4 ld reg, zp(8) 
+5 ld reg, mar(16)
+6 ld reg, XY
+7 st zp(8), reg
+8 st mar(16), reg
+9 st XY, reg
 8 push reg
 9 pop reg
 10 add A, reg
@@ -24,9 +28,7 @@
 24 shr A(must add shl as a pseudoinstruction ADD A, A)
 25 cp A, reg
 26 cpi A, imm
-27 jmp imm8
 28 jmp mar
-29 jcc imm8 (the conditions are decoded looking at the 3 lowest bits of the IRHB)
 30 jcc mar
 31 call mar
 32 SYSCALLS
