@@ -1,5 +1,6 @@
 {
   "useMarkdownLinks": true,
   "newLinkFormat": "absolute",
-  "alwaysUpdateLinks": true
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "notes/Attachments"
 }

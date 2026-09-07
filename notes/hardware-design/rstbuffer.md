@@ -16,6 +16,7 @@ Since the signal for the program counter to load is active-low, as well as the c
 | 0            | 1      | 1      |
 | 1            | 0      | 1      |
 | 1            | 1      | 0      |
+
 A single XOR gate would be needed.
 
 ## Program Counter Output Enable

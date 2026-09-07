@@ -5,4 +5,4 @@ Feel free to check out this repository if you're curious about my work. I try to
 
 ## CURRENT STATE
 
-![](Pasted%20image%2020260906223513.png)
+![](notes/Attachments/cpu1.png)
