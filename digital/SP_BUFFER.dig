@@ -28,7 +28,7 @@
       <elementAttributes>
         <entry>
           <string>Label</string>
-          <string>SPH IN</string>
+          <string>SPH</string>
         </entry>
         <entry>
           <string>Bits</string>
@@ -294,7 +294,7 @@
       <elementAttributes>
         <entry>
           <string>Label</string>
-          <string>SPL IN</string>
+          <string>SPL</string>
         </entry>
         <entry>
           <string>Bits</string>

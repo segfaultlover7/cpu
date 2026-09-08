@@ -33,27 +33,39 @@ When programming, the assembler will read the format, if it's MARL, the bit 8 of
 
 Load the data from the zero-page RAM address range to a register
 
-| Cycle | Control bits                                 |
-| ----- | ------------------------------------------ |
-| 0     | MEM_RD, nI                                   |
-| 1 PC_INC, nIRA_OE, nHBA_OE, MEM_RD, nMPC_RST D,  E,  |
+| Cycle | Control bits                                              |
+| ----- | --------------------------------------------------------- |
+| 0     | MEM_RD, nIR_LD                                            |
+| 1     | PC_INC, PC_OE, nIRA_OE, nHBA_OE, MEM_RD, REG_LD, nMPC_RST |
 ### $05 --> LD $reg, MAR
 
 Load the data of address (MAR) of RAM into a register
 
-| Cycle | Control bits                             |
-| ----- | ---------------------------------------- |
-| 0     | MEM_RD, nIR_LD                           |
-| 1     | PC_INC, PC_OE, nMAR_OE, MEM_RD, nMPC_RST |
+| Cycle | Control bits                                     |
+| ----- | ------------------------------------------------ |
+| 0     | MEM_RD, nIR_LD                                   |
+| 1     | PC_INC, PC_OE, nMAR_OE, MEM_RD, REG_LD, nMPC_RST |
 ### $06 --> LD $reg, XY
+
+| Cycle | Control bits                                     |
+| ----- | ------------------------------------------------ |
+| 0     | MEM_RD, nIR_LD                                   |
+| 1     | PC_INC, PC_OE, nXYA_OE, MEM_RD, REG_LD, nMPC_RST |
+### $07 --> ST zp(8), $reg
+
+| Cycle | Control bits                                              |
+| ----- | --------------------------------------------------------- |
+| 0     | MEM_RD, nIR_LD                                            |
+| 1     | PC_INC, PC_OE, nIRA_OE, nHBA_OE, MEM_WR, REG_OE, nMPC_RST |
+### $08 --> ST MAR, reg
 
 | Cycle | Control bits                            |
 | ----- | --------------------------------------- |
 | 0     | MEM_RD, nIR_LD                          |
 | 1     | PC_INC, PC_OE, XY_AOE, MEM_RD, nMPC_RST |
-### $07 --> ST zp(8), $reg
 
 
+1
 7 st zp(8), reg
 8 st mar(16), reg
 9 st XY, reg
@@ -77,7 +89,7 @@ Load the data of address (MAR) of RAM into a register
 27 cp A, reg
 28 cpi A, imm
 29 jcc mar (jmp will be 111 decode condition)
-30 call mar
+30 call marZ
 
 ## $31 --> Zero-Operand Instructions
 

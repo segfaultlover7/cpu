@@ -4,3 +4,4 @@
 - improve the instruction set document
 - finish the program counter file
 - fix address decoder (mmio and fb dont work as intended)
+- document each module 
