@@ -62,6 +62,23 @@ active_low_mask = (
     (1 << nHBA_OE)  | (1 << nXY_INC)
 )
 
+
+# flags
+
+def check_condition(sub_opcode, z, c, n, v):
+    conditions = {
+        0: c,        # JC
+        1: not c,    # JNC
+        2: z,        # JZ
+        3: not z,    # JNZ
+        4: n,        # JN
+        5: not n,    # JNN
+        6: v,        # JV
+        7: True      # JMP
+    }
+    return conditions.get(sub_opcode, False)
+
+
 # generating the microcode for the eproms
 
 total_address = 1 << 16
@@ -97,6 +114,9 @@ def gen_microcode():
             # overlapped fetch-execute pipeline: inc pc in parallel with the instruction
             if microstep == 1:
                 control_word |= (1 << PC_INC)
+
+            # evaluate condition for current address flag
+            take_jump = check_condition(sub_opcode, z_flag, c_flag, n_flag, v_flag)
 
             # instruction encoding
             if base_opcode == 0:  # MOV reg, imm8
@@ -171,6 +191,25 @@ def gen_microcode():
                     control_word |= (1 << nXYA_OE)
                     control_word |= (1 << MEM_WR)
                     control_word |= (1 << REG_OE)
+                    control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 10: # PUSH reg
+                if microstep == 1:
+                    control_word |= (1 << PC_OE)
+                    control_word |= (1 << REG_OE)
+                    control_word |= (1 << nSP_OE)
+                    control_word |= (1 << nSP_INC)
+                    control_word |= (1 << SP_DIR)
+                    control_word |= (1 << MEM_WR)
+                    control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 11: # POP reg
+                if microstep == 1:
+                    control_word |= (1 << PC_OE)
+                    control_word |= (1 << REG_LD)
+                    control_word |= (1 << nSP_OE)
+                    control_word |= (1 << nSP_INC)
+                    control_word |= (1 << MEM_RD)
                     control_word |= (1 << nMPC_RST)
 
             if base_opcode == 12:  # ADD A, reg
@@ -282,17 +321,89 @@ def gen_microcode():
                     control_word |= (1 << nFL_LD)
                     control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 23:  # INC XY
+            if base_opcode == 23:  # INC/DEC XY (swap microstep for subopcode if statements)
+                if sub_opcode == 0:
+                    if microstep == 1:
+                        control_word |= (1 << nXY_INC)
+                        control_word |= (1 << nMPC_RST)
+                if sub_opcode == 1:
+                    if microstep == 1:
+                        control_word |= (1 << nXY_INC)
+                        control_word |= (1 << XY_DIR)
+                        control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 24:  # SHR A
                 if microstep == 1:
-                    control_word |= (1 << nXY_INC)
+                    control_word |= (1 << nSHR_OE)
+                    control_word |= (1 << REG_LD)
                     control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 24:  # DEC XY
+            if base_opcode == 25:  # ROR A
                 if microstep == 1:
-                    control_word |= (1 << nXY_INC)
-                    control_word |= (1 << XY_DIR)
+                    control_word |= (1 << nSHR_OE)
+                    control_word |= (1 << REG_LD)
                     control_word |= (1 << nMPC_RST)
 
+            if base_opcode == 26:  # CP A, reg
+                if microstep == 1:
+                    control_word |= (1 << ALU_S1)
+                    control_word |= (1 << ALU_CIN)
+                    control_word |= (1 << REG_OE)
+                    control_word |= (1 << nFL_LD)
+                    control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 27:  # CP A, imm
+                if microstep == 1:
+                    control_word |= (1 << ALU_S1)
+                    control_word |= (1 << ALU_CIN)
+                    control_word |= (1 << nIRD_OE)
+                    control_word |= (1 << nFL_LD)
+                    control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 28:  # JCC MAR
+                if microstep == 1:
+                    if sub_opcode == 0: # JC (JMP if carry)
+                        control_word |= (1 << PC_OE)
+                        control_word |= (1 << nPC_LD)
+                        control_word |= (1 << nMAR_OE)
+                        control_word |= (1 << nMPC_RST)
+                    if sub_opcode == 1: # JNC (JMP if not carry)
+                        control_word |= (1 << nMPC_RST)
+                    if sub_opcode == 7: # JMP
+                        control_word |= (1 << PC_OE)
+                        control_word |= (1 << nPC_LD)
+                        control_word |= (1 << nMAR_OE)
+                        control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 29: # JCC XY
+                if microstep == 1:
+                    if sub_opcode == 7: # JMP
+                        control_word |= (1 << PC_OE)
+                        control_word |= (1 << nPC_LD)
+                        control_word |= (1 << nXY_OE)
+                        control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 30: # CALL MAR/XY
+                if microstep == 1:
+                    control_word |= (1 << PC_OE)
+                    control_word |= (1 << nPCL_OE)
+                    control_word |= (1 << nSP_INC)
+                    control_word |= (1 << SP_DIR)
+                    control_word |= (1 << MEM_WR)
+                if microstep == 2:
+                    control_word |= (1 << PC_OE)
+                    control_word |= (1 << nPCL_OE)
+                    control_word |= (1 << nSP_INC)
+                    control_word |= (1 << SP_DIR)
+                    control_word |= (1 << MEM_WR)
+                if microstep == 3:
+                    control_word |= (1 << PC_OE)
+                    control_word |= (1 << PC_LD)
+                    if sub_opcode == 0:
+                        control_word |= (1 << nMAR_OE)
+                    if sub_opcode == 1:
+                        control_word |= (1 << nXYA_OE)
+                    control_word |= (1 << nMPC_RST)
 
             if base_opcode == 31:
                 if sub_opcode == 0:

@@ -215,8 +215,8 @@ Rotate right through carry
 21 inc A
 22 dec A
 23 inc/dec XY
-24 ror A (must add rol A as a pseudoinstruction ADC A, A)
-25 shr A(must add shl as a pseudoinstruction ADD A, A)
+25 ror A (must add rol A as a pseudoinstruction ADC A, A)
+24 shr A(must add shl as a pseudoinstruction ADD A, A)
 26 cp A, reg
 27 cpi A, imm
 28 jcc mar

@@ -1,0 +1,2 @@
+- Be able to generate QR codes on the OLED screen(for example the QR link for the github repo)
+- Make a compiler (or adapt an existent one)
