@@ -357,12 +357,12 @@ def gen_microcode():
 
             if base_opcode == 27:  # JCC MAR
                 if microstep == 1:
-                    if sub_opcode == 0: # JC (JMP if carry)
+                    if sub_opcode == 0: # JZ (JMP if z)
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << nPC_LD)
                         control_word |= (1 << nMAR_OE)
                         control_word |= (1 << nMPC_RST)
-                    if sub_opcode == 1: # JNC (JMP if not carry)
+                    if sub_opcode == 1: # JNZ (JMP if not z)
                         control_word |= (1 << nMPC_RST)
                     if sub_opcode == 7: # JMP
                         control_word |= (1 << PC_OE)
@@ -407,9 +407,8 @@ def gen_microcode():
                                 control_word |= (1 << nMAR_OE)
                             if sub_opcode == 3:         # CALL XY
                                 control_word |= (1 << nXYA_OE)
-                            if sub_opcode == 4:         # CALL imm
+                            if sub_opcode == 4:         # CALL imm # NOT IMPLEMENTED, BUT CAN BE (MAYBE WILL??)
                                 control_word |= (1 << nIRA_OE)
-                                control_word |= (1 << nHBA_OE)
                             control_word |= (1 << nMPC_RST)
 
             if base_opcode == 30: # Stack Pointer operations
