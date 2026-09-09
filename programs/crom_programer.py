@@ -36,12 +36,12 @@ SHR_IN0  = 27   # bit 0 of the shr buffer; 0 = SHR, 1 = ROR
 nFL_OE   = 28   # outputs the flag register to the data bus
 nFL_LD   = 29   # loads the flag register
 FL_SEL   = 30   # mux that selects the flag register input between ALU and data bus (only first 4 flags)
-FB       = 31   # force B (break flag) to 1. used to distinguish hardware from software interrupts
+B_VAL    = 31   # force B (break flag) to 1. used to distinguish hardware from software interrupts
 
 # EPROM 3:
 
-nSEI     = 32   # set interrupts
-nCLI     = 33   # clear interrupts
+I_VAL    = 32   # force I (interrupt flag) to 1. used in SEI/CLI instructions
+I_WRITE  = 33   # write the value of I_VAL onto the 7474 flipflop
 nSP_INC  = 34   # increment the SP register
 SP_DIR   = 35   # 0 = INC, 1 = DEC
 nSP_LD   = 36   # load data from the address bus to the sp
@@ -58,10 +58,11 @@ active_low_mask = (
     (1 << nHBA_OE)  | (1 << nMPC_RST) | (1 << nMARL_LD)  |
     (1 << nMARH_LD) | (1 << nMAR_OE)  | (1 << nXY_INC)   |
     (1 << nXYA_OE)  | (1 << nALU_OE)  | (1 << nSHR_OE)   |
-    (1 << nFL_OE)   | (1 << nFL_LD)   | (1 << nSEI)      |
-    (1 << nCLI)     | (1 << nSP_INC)  | (1 << nSP_LD)    |
-    (1 << nSP_OE)   | (1 << nSPL_OE)  | (1 << nSPH_OE)
+    (1 << nFL_OE)   | (1 << nFL_LD)   | (1 << nSP_INC)   |
+    (1 << nSP_LD)   | (1 << nSP_OE)   | (1 << nSPL_OE)   |
+    (1 << nSPH_OE)
 )
+
 
 # flags
 
@@ -507,7 +508,14 @@ def gen_microcode():
                 if sub_opcode == 1:
                     control_word |= (1 << nMPC_RST) # to do - PUSHF
 
+                if sub_opcode == 5: # SEI
+                    control_word |= (1 << I_VAL)
+                    control_word |= (1 << I_WRITE)
+                    control_word |= (1 << nMPC_RST)
 
+                if sub_opcode == 6:
+                    control_word |= (1 << I_WRITE)
+                    control_word |= (1 << nMPC_RST)
 
         f_control_word = control_word ^ active_low_mask
 
