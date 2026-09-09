@@ -193,6 +193,8 @@ Increments or Decrements the XY register pair. Bit 8 selects which instruction i
 | ----- | ------------------------- |
 | 0     | MEM_RD, nIR_LD            |
 | 1     | PC_INC, nXY_INC, nMPC_RST |
+
+
 ### $24 --> ROR A
 
 Rotate right through carry
