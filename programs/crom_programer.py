@@ -119,37 +119,45 @@ def gen_microcode():
             take_jump = check_condition(sub_opcode, z_flag, c_flag, n_flag, v_flag)
 
             # instruction encoding
-            if base_opcode == 0:  # MOV reg, imm8
+            if base_opcode == 0:  # MOV REG
                 if microstep == 1:
                     control_word |= (1 << nIRD_OE)
                     control_word |= (1 << REG_LD)
                     control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 1:  # MOV reg, reg
+            if base_opcode == 1:  # MOV REG, REG
                 if microstep == 1:
                     control_word |= (1 << REG_OE)
                     control_word |= (1 << REG_LD)
                     control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 2:  # MOV MARL/MARH, imm8
-                if microstep == 1:
-                    control_word |= (1 << nIRD_OE)
-                    if sub_opcode == 0:  # MOV MARL, imm8
+            if base_opcode == 2:
+                if sub_opcode == 0: # MOV MARL, Imm
+                    if microstep == 1:
+                        control_word |= (1 << nIRD_OE)
                         control_word |= (1 << nMARL_LD)
-                    if sub_opcode == 1:  # MOV MARH, imm8
-                        control_word |= (1 << nMARH_LD)
-                    control_word |= (1 << nMPC_RST)
+                        control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 3:  # MOV MARL/MARH, reg
-                if microstep == 1:
-                    control_word |= (1 << REG_OE)
-                    if sub_opcode == 0:  # MOV MARL, reg
+                elif sub_opcode == 1: # MOV MARH, Imm
+                    if microstep == 1:
+                        control_word |= (1 << nIRD_OE)
                         control_word |= (1 << nMARL_LD)
-                    if sub_opcode == 1:  # MOV MARH, reg
-                        control_word |= (1 << nMARH_LD)
-                    control_word |= (1 << nMPC_RST)
+                        control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 4:  # LD reg, zp(imm8)
+            if base_opcode == 3:
+                if sub_opcode == 0: # MOV MARL, REG
+                    if microstep == 1:
+                        control_word |= (1 << REG_OE)
+                        control_word |= (1 << nMARL_LD)
+                        control_word |= (1 << nMPC_RST)
+
+                elif sub_opcode == 1: # MOV MARH, REG
+                    if microstep == 1:
+                        control_word |= (1 << REG_OE)
+                        control_word |= (1 << nMARL_LD)
+                        control_word |= (1 << nMPC_RST)
+
+            if base_opcode == 4:  # LD reg, Imm
                 if microstep == 1:
                     control_word |= (1 << PC_OE)
                     control_word |= (1 << nIRA_OE)
@@ -355,15 +363,17 @@ def gen_microcode():
                     control_word |= (1 << nFL_LD)
                     control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 27:  # JCC MAR
+            if base_opcode == 27:  # JCC MAR # CORRECT THE FORMAT
                 if microstep == 1:
                     if sub_opcode == 0: # JZ (JMP if z)
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << nPC_LD)
                         control_word |= (1 << nMAR_OE)
                         control_word |= (1 << nMPC_RST)
+
                     if sub_opcode == 1: # JNZ (JMP if not z)
                         control_word |= (1 << nMPC_RST)
+
                     if sub_opcode == 7: # JMP
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << nPC_LD)
@@ -378,20 +388,23 @@ def gen_microcode():
                         control_word |= (1 << nXYA_OE)
                         control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 29:  # Pointers and Subroutine
+            if base_opcode == 29:  # Pointers and Subroutine # CORRECT THE FORMAT
                 if microstep == 1:
                     if sub_opcode == 0:  # INC XY
                         control_word |= (1 << nXY_INC)
                         control_word |= (1 << nMPC_RST)
+
                     if sub_opcode == 1:  # DEC XY
                         control_word |= (1 << nXY_INC)
                         control_word |= (1 << XY_DIR)
                         control_word |= (1 << nMPC_RST)
+
                     else:
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << nPCL_OE)
                         control_word |= (1 << nSP_INC)
                         control_word |= (1 << SP_DIR)
+                        control_word |= (1 << nSP_OE)
                         control_word |= (1 << MEM_WR)
 
                         if microstep == 2:
@@ -399,52 +412,95 @@ def gen_microcode():
                             control_word |= (1 << nPCH_OE)
                             control_word |= (1 << nSP_INC)
                             control_word |= (1 << SP_DIR)
+                            control_word |= (1 << nSP_OE)
                             control_word |= (1 << MEM_WR)
+
                         if microstep == 3:
                             control_word |= (1 << PC_OE)
                             control_word |= (1 << PC_LD)
+
                             if sub_opcode == 2:         # CALL MAR
                                 control_word |= (1 << nMAR_OE)
+
                             if sub_opcode == 3:         # CALL XY
                                 control_word |= (1 << nXYA_OE)
-                            if sub_opcode == 4:         # CALL imm # NOT IMPLEMENTED, BUT CAN BE (MAYBE WILL??)
-                                control_word |= (1 << nIRA_OE)
+
                             control_word |= (1 << nMPC_RST)
 
             if base_opcode == 30: # Stack Pointer operations
-                if microstep == 1:
-                    if sub_opcode == 0:  # MOV SP, MAR
+                if sub_opcode == 0: # MOV SP, MAR
+                    if microstep == 1:
+                        pass
+                    elif microstep == 2:
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << nMAR_OE)
                         control_word |= (1 << nSP_LD)
                         control_word |= (1 << nMPC_RST)
-                    if sub_opcode == 1:  # MOV MAR, SP
+
+                elif sub_opcode == 1: # MOV MAR, SP
+                    if microstep == 1:
                         control_word |= (1 << nSPL_OE)
                         control_word |= (1 << nMARL_LD)
-                        if microstep == 2:
-                            control_word |= (1 << nSPH_OE)
-                            control_word |= (1 << nMARH_LD)
-                            control_word |= (1 << nMPC_RST)
-                    if sub_opcode == 2:  # MOV SP, XY
+                    elif microstep == 2:
+                        control_word |= (1 << nSPH_OE)
+                        control_word |= (1 << nMARH_LD)
+                        control_word |= (1 << nMPC_RST)
+
+                elif sub_opcode == 2: # MOV SP, XY
+                    if microstep == 1:
+                        pass
+                    elif microstep == 2:
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << nXYA_OE)
                         control_word |= (1 << nSP_LD)
                         control_word |= (1 << nMPC_RST)
-                    if sub_opcode == 3:  # INC SP
+
+                elif sub_opcode == 3: # INC SP
+                    if microstep == 1:
                         control_word |= (1 << nSP_INC)
                         control_word |= (1 << nMPC_RST)
-                    if sub_opcode == 4:  # DEC SP
+
+                elif sub_opcode == 4: # DEC SP
+                    if microstep == 1:
                         control_word |= (1 << nSP_INC)
                         control_word |= (1 << SP_DIR)
                         control_word |= (1 << nMPC_RST)
-                    if sub_opcode == 6:  # MOV SPH, X (decoded by hardware to select X)
+
+                elif sub_opcode == 6: # MOV X, SPH
+                    if microstep == 1:
                         control_word |= (1 << nSPH_OE)
                         control_word |= (1 << REG_LD)
-                    if sub_opcode == 7:  # MOV SPL, Y (decoded by hardware to select Y)
+                        control_word |= (1 << nMPC_RST)
+
+                elif sub_opcode == 7: # MOV Y, SPL
+                    if microstep == 1:
                         control_word |= (1 << nSPL_OE)
                         control_word |= (1 << REG_LD)
+                        control_word |= (1 << nMPC_RST)
 
-            if base_opcode == 31:
+            if base_opcode == 31: # CORRECT THE FORMAT
+                if microstep == 1:
+                    if sub_opcode == 0:   # BRK
+                        control_word |= (1 << nMPC_RST)
+
+                    if sub_opcode == 3:   # RET
+                        control_word |= (1 << PC_OE)
+                        control_word |= (1 << nSP_INC)
+                        control_word |= (1 << nSP_OE)
+                        control_word |= (1 << MEM_RD)
+                        control_word |= (1 << nMARH_LD)
+                        if microstep == 2:
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nSP_INC)
+                            control_word |= (1 << nSP_OE)
+                            control_word |= (1 << MEM_RD)
+                            control_word |= (1 << nMARL_LD)
+                        if microstep == 3:
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nPC_LD)
+                            control_word |= (1 << nMAR_OE)
+                            control_word |= (1 << nMPC_RST)
+
                 if sub_opcode == 0:
                     control_word |= (1 << nMPC_RST) # to do - BRK
 

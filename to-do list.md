@@ -9,4 +9,4 @@
 - make the XY registers inc/dec instruction in hardware (wire bit 8)
 - make pseudoinstructions: NOP, SHL, ROL (and more complex ones)
 - maybe divide pseudoinstructions in single-instruction or multi-instruction?
-- 
+- document about fetch-execute overlap and in which instructions in a new document called structural hazard.

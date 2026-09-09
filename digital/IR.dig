@@ -1414,20 +1414,6 @@
       <elementName>Out</elementName>
       <elementAttributes>
         <entry>
-          <string>rotation</string>
-          <rotation rotation="2"/>
-        </entry>
-        <entry>
-          <string>Label</string>
-          <string>[8]</string>
-        </entry>
-      </elementAttributes>
-      <pos x="720" y="700"/>
-    </visualElement>
-    <visualElement>
-      <elementName>Out</elementName>
-      <elementAttributes>
-        <entry>
           <string>Label</string>
           <string>[7:5]</string>
         </entry>
@@ -1561,20 +1547,6 @@
         </entry>
       </elementAttributes>
       <pos x="1040" y="960"/>
-    </visualElement>
-    <visualElement>
-      <elementName>Tunnel</elementName>
-      <elementAttributes>
-        <entry>
-          <string>rotation</string>
-          <rotation rotation="1"/>
-        </entry>
-        <entry>
-          <string>NetName</string>
-          <string>I8</string>
-        </entry>
-      </elementAttributes>
-      <pos x="740" y="620"/>
     </visualElement>
     <visualElement>
       <elementName>74245.dig</elementName>
@@ -2069,10 +2041,6 @@
       <p2 x="640" y="700"/>
     </wire>
     <wire>
-      <p1 x="720" y="700"/>
-      <p2 x="740" y="700"/>
-    </wire>
-    <wire>
       <p1 x="1380" y="700"/>
       <p2 x="1400" y="700"/>
     </wire>
@@ -2363,10 +2331,6 @@
     <wire>
       <p1 x="740" y="180"/>
       <p2 x="740" y="200"/>
-    </wire>
-    <wire>
-      <p1 x="740" y="620"/>
-      <p2 x="740" y="700"/>
     </wire>
     <wire>
       <p1 x="420" y="480"/>
