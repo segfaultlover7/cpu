@@ -1,12 +1,9 @@
 - rewrite the instruction decoding to make it easier to understand
 - make a block diagram of the register file (if possible)
 - fix the 'and' row of the table alu core
-- improve the instruction set document
 - finish the program counter file
 - fix address decoder (mmio and fb dont work as intended)
-- document each module 
-- do pop and push reg instructions
-- make the XY registers inc/dec instruction in hardware (wire bit 8)
 - make pseudoinstructions: NOP, SHL, ROL (and more complex ones)
 - maybe divide pseudoinstructions in single-instruction or multi-instruction?
 - document about fetch-execute overlap and in which instructions in a new document called structural hazard.
+- (once most documentation is finished) change the folder system to have each module its own folder with the notes, images and its real hardware implementation, datasheets, etc.

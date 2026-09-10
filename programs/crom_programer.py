@@ -273,10 +273,13 @@ def gen_microcode():
 
                 if base_opcode == 11: # POP reg
                     if microstep == 1:
+                        control_word |= (1 << PC_OE) # not necessary, only for debugging purposes
+                        control_word |= (1 << nSP_OE) # same
+                        control_word |= (1 << nSP_INC)
+                    if microstep == 2:
                         control_word |= (1 << PC_OE)
                         control_word |= (1 << REG_LD)
                         control_word |= (1 << nSP_OE)
-                        control_word |= (1 << nSP_INC)
                         control_word |= (1 << MEM_RD)
                         control_word |= (1 << nMPC_RST)
 
@@ -599,41 +602,21 @@ def gen_microcode():
                     elif sub_opcode == 2: # POPF
                         if microstep == 1:
                             control_word |= (1 << PC_OE)
-                            control_word |= (1 << nFL_LD)
                             control_word |= (1 << nSP_OE)
                             control_word |= (1 << nSP_INC)
+                        if microstep == 2:
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nFL_LD)
+                            control_word |= (1 << nSP_OE)
                             control_word |= (1 << MEM_RD)
                             control_word |= (1 << nMPC_RST)
 
                     elif sub_opcode == 3: # RET
-                        if microstep == 1: # POP PCL into MARL
+                        if microstep == 1: # SP++; (for POP)
                             control_word |= (1 << PC_OE)
-                            control_word |= (1 << nMARL_LD)
                             control_word |= (1 << nSP_OE)
                             control_word |= (1 << nSP_INC)
-                            control_word |= (1 << MEM_RD)
-                        elif microstep == 2: # POP PCH into MARH
-                            control_word |= (1 << PC_OE)
-                            control_word |= (1 << nMARH_LD)
-                            control_word |= (1 << nSP_OE)
-                            control_word |= (1 << nSP_INC)
-                            control_word |= (1 << MEM_RD)
-                        elif microstep == 3: # LOAD MAR into PC
-                            control_word |= (1 << PC_OE)
-                            control_word |= (1 << nPC_LD)
-                            control_word |= (1 << nMAR_OE)
-                            control_word |= (1 << nMPC_RST)
-
-                    elif sub_opcode == 4: # RTI
-                        if microstep == 1: # POP FLAGS
-                            control_word |= (1 << PC_OE)
-                            control_word |= (1 << nFL_LD)
-                            control_word |= (1 << nSP_OE)
-                            control_word |= (1 << nSP_INC)
-                            control_word |= (1 << MEM_RD)
-                            control_word |= (1 << I_WRITE)
-                            control_word |= (1 << FL_SEL)
-                        elif microstep == 2: # POP PCL into MARL
+                        if microstep == 2: # POP PCL into MARL
                             control_word |= (1 << PC_OE)
                             control_word |= (1 << nMARL_LD)
                             control_word |= (1 << nSP_OE)
@@ -643,9 +626,38 @@ def gen_microcode():
                             control_word |= (1 << PC_OE)
                             control_word |= (1 << nMARH_LD)
                             control_word |= (1 << nSP_OE)
-                            control_word |= (1 << nSP_INC)
                             control_word |= (1 << MEM_RD)
                         elif microstep == 4: # LOAD MAR into PC
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nPC_LD)
+                            control_word |= (1 << nMAR_OE)
+                            control_word |= (1 << nMPC_RST)
+
+                    elif sub_opcode == 4: # RTI
+                        if microstep == 1: # SP++ (for POP)
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nSP_OE)
+                            control_word |= (1 << nSP_INC)
+                        if microstep == 2: # POP FLAGS
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nFL_LD)
+                            control_word |= (1 << nSP_OE)
+                            control_word |= (1 << nSP_INC)
+                            control_word |= (1 << MEM_RD)
+                            control_word |= (1 << I_WRITE)
+                            control_word |= (1 << FL_SEL)
+                        elif microstep == 3: # POP PCL into MARL
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nMARL_LD)
+                            control_word |= (1 << nSP_OE)
+                            control_word |= (1 << nSP_INC)
+                            control_word |= (1 << MEM_RD)
+                        elif microstep == 4: # POP PCH into MARH
+                            control_word |= (1 << PC_OE)
+                            control_word |= (1 << nMARH_LD)
+                            control_word |= (1 << nSP_OE)
+                            control_word |= (1 << MEM_RD)
+                        elif microstep == 5: # LOAD MAR into PC
                             control_word |= (1 << PC_OE)
                             control_word |= (1 << nPC_LD)
                             control_word |= (1 << nMAR_OE)
