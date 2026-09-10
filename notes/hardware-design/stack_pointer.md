@@ -42,11 +42,8 @@ During execution of step 1, SP drives a completely stable address onto the bus.
 On the rising clock edge, the RAM latches the incoming register data simultaneously as SP decrements. Because SP does not change states until AFTER the clock edge triggers, no race condition or address instability occurs.
 This happens because of the physical propagation delay (t_pd) of the 74HC191. Static RAM architectures have an address hold time requirement (t_h) of 0 ns relative to the active write edge. Because the 74HC191 has a propagation delay between 31 ns and 38 ns (at Vcc = 4.5V), the address remains driven on the bus well after the memory write cycle completes, completing safely the operation.
 
-![](notes/Attachments/Pasted%20image%2020260910201336.png)
+<img src="../Attachments/sp_vw.png" alt="Stack Pointer" width="400" />
 
-![334](notes/Attachments/Pasted%20image%2020260910201201.png)
-
-(an oscilloscope view of this will be done in the future)
 ### POP (2 Cycles)
 
 The Stack Pointer is first pointing to the next address to be pushed, so the first thing that must be done is increment the SP, and on the next cycle, the RAM is read and copied to a register. That means the stack is LIFO (Last-in-First-Out).
@@ -56,9 +53,18 @@ First, the pointer is adjusted by doing an increment, and on the second cycle, t
 It is for the exact same reason that the `PUSH` is able to be performed in one cycle that the `POP` is not.
 ## Design justifications
 
-Dedicated Counters vs. ALU Routing
-16-bit SP instead of 8-bit SP
-Downwards growth
+### Dedicated Counters instead of ALU Routing
+
+Using dedicated 74191 counters allow for `PUSH` and `POP` to modify addresses automatically without passing SP through the main ALU, keeping the ALU free for arithmetic and saving clock cycles.
+
+### 16-bit SP instead of 8-bit SP
+
+Having a full 16-bit SP allows the stack to reside anywhere in the 64KB address space rather than locking it in one place and having only 256 memory bytes of capacity.
+
+### Downward Growth
+
+Although modern CPUs work with upward growth, my intention was to match standard hardware conventions, and also because the lower addresses of RAM already contain the zero-page, dynamic vectors, etc.
+
 
 
 

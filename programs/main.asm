@@ -1,7 +1,6 @@
 ; cpu test, start at 0xC000
 ; start SP at 0x3FFF
 .main:
-  SEI
   MOV X, 0x3F
   MOV Y, 0xFF
   MOV SP, XY
