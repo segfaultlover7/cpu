@@ -10,7 +10,7 @@ REGISTER_MAP = {
     "E": 4, "F": 5, "X": 6, "Y": 7
 }
 
-# Aligned with check_condition() in crom_programer_3.py
+# Aligned with check_condition() in microcode generator
 JMP_COND_MAP = {
     "JC": 0, "JNC": 1, "JZ": 2, "JNZ": 3,
     "JN": 4, "JNN": 5, "JV": 6, "JMP": 7
@@ -18,8 +18,8 @@ JMP_COND_MAP = {
 
 # Aligned with Base Opcode 31 in microcode
 SYSTEM_OPS = {
-    "BRK": 0, "PUSHF": 1, "POPF": 2, "RET": 3,
-    "RTI": 4, "RETI": 4, "SEI": 5, "CLI": 6, "HALT": 7
+    "BRK": 0, "RET": 1, "RTI": 2, "RETI": 2,
+    "SEI": 3, "CLI": 4, "PUSHF": 5, "POPF": 6
 }
 
 # ==============================================================================
@@ -156,11 +156,15 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         return (0x1D << 11) | (0x0 << 8)
     if mnemonic == "DEC" and tokens[0] == "XY":
         return (0x1D << 11) | (0x1 << 8)
+    if mnemonic == "INC" and tokens[0] == "MAR":
+        return (0x1D << 11) | (0x2 << 8)
+    if mnemonic == "DEC" and tokens[0] == "MAR":
+        return (0x1D << 11) | (0x3 << 8)
     if mnemonic == "CALL":
-        if tokens[0] == "MAR":
-            return (0x1D << 11) | (0x2 << 8)
-        elif tokens[0] == "XY":
-            return (0x1D << 11) | (0x3 << 8)
+        if tokens[0] == "XY":
+            return (0x1D << 11) | (0x4 << 8)
+        elif tokens[0] == "MAR":
+            return (0x1D << 11) | (0x5 << 8)
 
     # --------------------------------------------------------------------------
     # Opcode 0x1B / 0x1C: Conditional & Unconditional Jumps (Base 27 / 28)

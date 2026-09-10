@@ -12,13 +12,5 @@ It's only job is to make sure that, when the address is on each address range, t
 
 ## Decoder Schematic Connections
 
-(this is more useful to me so that i don't forget what i did)
+<img src="../Attachments/adr_dec.png" alt="Address decoder" width="500" />
 
-<img src="../Attachments/addec.png" alt="Address decoder" width="500" />
-
-First of all, there is a 74139 dual 2-to-4 decoder, which has as inputs A15 and A14, meaning that I divide the memory into 4 16KB blocks.
-
-Out of these 4, only the last one I need, because that's the upper 16KB, which differenciates between ROM and RAM.
-
-The other half of the 74139 is used with the addresses A9 and A8, and this is because it decodes into 4 256 B blocks, whose last output (2Y3) is exactly the
-`nMMIO_CS` bit. It's the last, because its selector ONLY activates when address bits A15, A14, A13 and A12 are one, so it decodes perfectly as `0xFF00`.
