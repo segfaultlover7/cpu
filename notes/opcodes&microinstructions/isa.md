@@ -64,7 +64,7 @@
 | PUSHF         |  0x1F  |  0x1  |        Mem[SP] <-- FR<br>SP - 1        |    -    |   2    |
 | POPF          |  0x1F  |  0x2  |        SP + 1<br>FR <-- Mem[SP]        |    -    |   2    |
 | RET           |  0x1F  |  0x3  |                                        |    -    |        |
-| RETI          |  0x1F  |  0x4  |                                        |    -    |        |
+| RTI           |  0x1F  |  0x4  |                                        |    -    |        |
 | SEI           |  0x1F  |  0x5  |                 I = 1                  |    -    |        |
 | CLI           |  0x1F  |  0x6  |                 I = 0                  |    -    |        |
 | HALT          |  0x1F  |  0x7  |                HALT mPC                |    -    |        |

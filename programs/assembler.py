@@ -10,14 +10,16 @@ REGISTER_MAP = {
     "E": 4, "F": 5, "X": 6, "Y": 7
 }
 
+# Aligned with check_condition() in crom_programer_3.py
 JMP_COND_MAP = {
-    "JZ": 0, "JNZ": 1, "JC": 2, "JNC": 3,
+    "JC": 0, "JNC": 1, "JZ": 2, "JNZ": 3,
     "JN": 4, "JNN": 5, "JV": 6, "JMP": 7
 }
 
+# Aligned with Base Opcode 31 in microcode
 SYSTEM_OPS = {
     "BRK": 0, "PUSHF": 1, "POPF": 2, "RET": 3,
-    "RETI": 4, "SEI": 5, "CLI": 6, "HALT": 7
+    "RTI": 4, "RETI": 4, "SEI": 5, "CLI": 6, "HALT": 7
 }
 
 # ==============================================================================
@@ -65,6 +67,7 @@ def expand_pseudoinstructions(mnemonic, tokens):
     Expands high-level pseudoinstructions into base ISA instructions.
     - CALL label / CALL MAR, label -> MOV MARL + MOV MARH + CALL MAR
     - CALL XY, label               -> MOV X + MOV Y + CALL XY
+    - Jcc label                    -> MOV MARL + MOV MARH + Jcc MAR
     """
     if mnemonic in ["CALL", "CALLXY"]:
         if mnemonic == "CALLXY":
@@ -75,13 +78,11 @@ def expand_pseudoinstructions(mnemonic, tokens):
                 ("CALL", ["XY"])
             ]
         
-        # Syntax: CALL MAR / CALL XY (hardware direct) vs CALL label / CALL MAR label / CALL XY label
         if len(tokens) == 1:
             target = tokens[0]
             if target in ["MAR", "XY"]:
-                return [(mnemonic, tokens)]  # Hardware instruction
+                return [(mnemonic, tokens)]
             else:
-                # Default CALL label expands via MAR pointer
                 return [
                     ("MOV", ["MARL", f"LOW:{target}"]),
                     ("MOV", ["MARH", f"HIGH:{target}"]),
@@ -102,6 +103,16 @@ def expand_pseudoinstructions(mnemonic, tokens):
                     ("CALL", ["XY"])
                 ]
 
+    # Auto-expand conditional jump to labels via MAR
+    if mnemonic in JMP_COND_MAP:
+        if len(tokens) == 1 and tokens[0] not in ["MAR", "XY"]:
+            target = tokens[0]
+            return [
+                ("MOV", ["MARL", f"LOW:{target}"]),
+                ("MOV", ["MARH", f"HIGH:{target}"]),
+                (mnemonic, ["MAR"])
+            ]
+
     return [(mnemonic, tokens)]
 
 # ==============================================================================
@@ -111,15 +122,16 @@ def expand_pseudoinstructions(mnemonic, tokens):
 def encode_instruction(mnemonic, tokens, symbol_table):
     """
     Encodes instructions according to the exact ISA table opcodes and subopcodes.
+    High Byte [15:8] holds the 8-bit IR opcode: (base_opcode << 3) | sub_opcode
     """
     # --------------------------------------------------------------------------
-    # Opcode 0x1F: System & Interrupt Instructions
+    # Opcode 0x1F: System & Interrupt Instructions (Base 31)
     # --------------------------------------------------------------------------
     if mnemonic in SYSTEM_OPS:
         return (0x1F << 11) | (SYSTEM_OPS[mnemonic] << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x1E: Stack Pointer & Special Register Instructions
+    # Opcode 0x1E: Stack Pointer & Special Register Instructions (Base 30)
     # --------------------------------------------------------------------------
     if mnemonic == "MOV":
         if tokens[0] == "SP" and tokens[1] == "MAR":
@@ -138,7 +150,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         return (0x1E << 11) | (0x4 << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x1D: Pointer Operations & Hardware Calls
+    # Opcode 0x1D: Pointer Operations & Hardware Calls (Base 29)
     # --------------------------------------------------------------------------
     if mnemonic == "INC" and tokens[0] == "XY":
         return (0x1D << 11) | (0x0 << 8)
@@ -151,7 +163,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x1D << 11) | (0x3 << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x1B / 0x1C: Conditional & Unconditional Jumps
+    # Opcode 0x1B / 0x1C: Conditional & Unconditional Jumps (Base 27 / 28)
     # --------------------------------------------------------------------------
     if mnemonic in JMP_COND_MAP:
         subop = JMP_COND_MAP[mnemonic]
@@ -162,7 +174,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x1C << 11) | (subop << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x02 / 0x03: MOV MARL / MOV MARH
+    # Opcode 0x02 / 0x03: MOV MARL / MOV MARH (Base 2 / 3)
     # --------------------------------------------------------------------------
     if mnemonic == "MOV" and tokens[0] in ["MARL", "MARH"]:
         bit_8 = 1 if tokens[0] == "MARH" else 0
@@ -174,7 +186,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x02 << 11) | (bit_8 << 8) | (val & 0xFF)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x00 / 0x01: MOV Register Operations
+    # Opcode 0x00 / 0x01: MOV Register Operations (Base 0 / 1)
     # --------------------------------------------------------------------------
     if mnemonic == "MOV" and tokens[0] in REGISTER_MAP:
         r_dest = REGISTER_MAP[tokens[0]]
@@ -186,7 +198,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x00 << 11) | (r_dest << 8) | (val & 0xFF)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x04 / 0x05 / 0x06: LD Register Operations
+    # Opcode 0x04 / 0x05 / 0x06: LD Register Operations (Base 4 / 5 / 6)
     # --------------------------------------------------------------------------
     if mnemonic == "LD":
         r_dest = REGISTER_MAP[tokens[0]]
@@ -200,7 +212,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x04 << 11) | (r_dest << 8) | (val & 0xFF)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x07 / 0x08 / 0x09: ST Memory Operations
+    # Opcode 0x07 / 0x08 / 0x09: ST Memory Operations (Base 7 / 8 / 9)
     # --------------------------------------------------------------------------
     if mnemonic == "ST":
         target = tokens[0]
@@ -214,7 +226,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x07 << 11) | (r_src << 8) | (val & 0xFF)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x0A / 0x0B: PUSH & POP Operations
+    # Opcode 0x0A / 0x0B: PUSH & POP Operations (Base 10 / 11)
     # --------------------------------------------------------------------------
     if mnemonic == "PUSH":
         return (0x0A << 11) | (REGISTER_MAP[tokens[0]] << 8)
@@ -222,7 +234,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         return (0x0B << 11) | (REGISTER_MAP[tokens[0]] << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x15 - 0x18: Unary Accumulator Operations
+    # Opcode 0x15 - 0x18: Unary Accumulator Operations (Base 21 - 24)
     # --------------------------------------------------------------------------
     if mnemonic == "INC" and tokens[0] == "A": return (0x15 << 11)
     if mnemonic == "DEC" and tokens[0] == "A": return (0x16 << 11)
@@ -230,7 +242,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
     if mnemonic == "ROR" and tokens[0] == "A": return (0x18 << 11)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x0C - 0x14, 0x19 - 0x1A: ALU Operations
+    # Opcode 0x0C - 0x14, 0x19 - 0x1A: ALU Operations (Base 12 - 20, 25 - 26)
     # --------------------------------------------------------------------------
     alu_map = {
         "ADD": (0x0C, 0x0D),
