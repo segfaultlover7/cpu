@@ -4,7 +4,6 @@
   SEI
   MOV X, 0x3F
   MOV Y, 0xFF
-  CLI
   MOV SP, XY
   MOV MARL, 0x09
   MOV MARH, 0xC0

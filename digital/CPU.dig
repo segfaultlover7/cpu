@@ -1182,7 +1182,7 @@
           <string>nFL_OE</string>
         </entry>
       </elementAttributes>
-      <pos x="980" y="480"/>
+      <pos x="980" y="500"/>
     </visualElement>
     <visualElement>
       <elementName>Tunnel</elementName>
@@ -1206,7 +1206,7 @@
           <string>nFL_LD</string>
         </entry>
       </elementAttributes>
-      <pos x="980" y="500"/>
+      <pos x="980" y="520"/>
     </visualElement>
     <visualElement>
       <elementName>Tunnel</elementName>
@@ -1230,7 +1230,7 @@
           <string>FL_SEL</string>
         </entry>
       </elementAttributes>
-      <pos x="980" y="520"/>
+      <pos x="980" y="540"/>
     </visualElement>
     <visualElement>
       <elementName>Tunnel</elementName>
@@ -1275,7 +1275,7 @@
       <elementAttributes>
         <entry>
           <string>NetName</string>
-          <string>FB</string>
+          <string>B_SET</string>
         </entry>
       </elementAttributes>
       <pos x="1220" y="960"/>
@@ -1289,10 +1289,10 @@
         </entry>
         <entry>
           <string>NetName</string>
-          <string>FB</string>
+          <string>B_SET</string>
         </entry>
       </elementAttributes>
-      <pos x="980" y="540"/>
+      <pos x="980" y="480"/>
     </visualElement>
     <visualElement>
       <elementName>Tunnel</elementName>

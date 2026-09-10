@@ -3,6 +3,15 @@
   <version>2</version>
   <attributes>
     <entry>
+      <string>backgroundColor</string>
+      <awt-color>
+        <red>255</red>
+        <green>153</green>
+        <blue>255</blue>
+        <alpha>255</alpha>
+      </awt-color>
+    </entry>
+    <entry>
       <string>romContent</string>
       <romList>
         <roms/>
@@ -11,15 +20,6 @@
     <entry>
       <string>Width</string>
       <int>7</int>
-    </entry>
-    <entry>
-      <string>backgroundColor</string>
-      <awt-color>
-        <red>255</red>
-        <green>153</green>
-        <blue>255</blue>
-        <alpha>255</alpha>
-      </awt-color>
     </entry>
   </attributes>
   <visualElements>
@@ -115,11 +115,15 @@
       <elementName>Out</elementName>
       <elementAttributes>
         <entry>
+          <string>rotation</string>
+          <rotation rotation="2"/>
+        </entry>
+        <entry>
           <string>Label</string>
           <string>nROM_CS</string>
         </entry>
       </elementAttributes>
-      <pos x="1000" y="980"/>
+      <pos x="480" y="780"/>
     </visualElement>
     <visualElement>
       <elementName>Out</elementName>
@@ -180,6 +184,10 @@
       <p2 x="1000" y="780"/>
     </wire>
     <wire>
+      <p1 x="480" y="780"/>
+      <p2 x="520" y="780"/>
+    </wire>
+    <wire>
       <p1 x="520" y="780"/>
       <p2 x="560" y="780"/>
     </wire>
@@ -206,10 +214,6 @@
     <wire>
       <p1 x="800" y="980"/>
       <p2 x="820" y="980"/>
-    </wire>
-    <wire>
-      <p1 x="940" y="980"/>
-      <p2 x="1000" y="980"/>
     </wire>
     <wire>
       <p1 x="420" y="340"/>
