@@ -10,16 +10,17 @@ REGISTER_MAP = {
     "E": 4, "F": 5, "X": 6, "Y": 7
 }
 
-# Aligned with check_condition() in microcode generator
+# Aligned with check_condition() in microcode generator (Base 27 / 28)
 JMP_COND_MAP = {
     "JC": 0, "JNC": 1, "JZ": 2, "JNZ": 3,
-    "JN": 4, "JNN": 5, "JV": 6, "JMP": 7
+    "JN": 4, "JNN": 5, "JV": 6, "JNV": 7
 }
 
 # Aligned with Base Opcode 31 in microcode
 SYSTEM_OPS = {
     "BRK": 0, "RET": 1, "RTI": 2, "RETI": 2,
-    "SEI": 3, "CLI": 4, "PUSHF": 5, "POPF": 6
+    "SEI": 3, "CLI": 4, "PUSHF": 5, "POPF": 6,
+    "HALT": 7
 }
 
 # ==============================================================================
@@ -67,7 +68,7 @@ def expand_pseudoinstructions(mnemonic, tokens):
     Expands high-level pseudoinstructions into base ISA instructions.
     - CALL label / CALL MAR, label -> MOV MARL + MOV MARH + CALL MAR
     - CALL XY, label               -> MOV X + MOV Y + CALL XY
-    - Jcc label                    -> MOV MARL + MOV MARH + Jcc MAR
+    - Jcc label / JMP label        -> MOV MARL + MOV MARH + Jcc/JMP MAR
     """
     if mnemonic in ["CALL", "CALLXY"]:
         if mnemonic == "CALLXY":
@@ -103,8 +104,8 @@ def expand_pseudoinstructions(mnemonic, tokens):
                     ("CALL", ["XY"])
                 ]
 
-    # Auto-expand conditional jump to labels via MAR
-    if mnemonic in JMP_COND_MAP:
+    # Auto-expand conditional jumps and unconditional JMP to labels via MAR
+    if mnemonic in JMP_COND_MAP or mnemonic == "JMP":
         if len(tokens) == 1 and tokens[0] not in ["MAR", "XY"]:
             target = tokens[0]
             return [
@@ -150,7 +151,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         return (0x1E << 11) | (0x4 << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x1D: Pointer Operations & Hardware Calls (Base 29)
+    # Opcode 0x1D: Pointer Operations, Hardware Calls & Unconditional JMPs (Base 29)
     # --------------------------------------------------------------------------
     if mnemonic == "INC" and tokens[0] == "XY":
         return (0x1D << 11) | (0x0 << 8)
@@ -165,9 +166,14 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             return (0x1D << 11) | (0x4 << 8)
         elif tokens[0] == "MAR":
             return (0x1D << 11) | (0x5 << 8)
+    if mnemonic == "JMP":
+        if tokens[0] == "XY":
+            return (0x1D << 11) | (0x6 << 8)
+        elif tokens[0] == "MAR":
+            return (0x1D << 11) | (0x7 << 8)
 
     # --------------------------------------------------------------------------
-    # Opcode 0x1B / 0x1C: Conditional & Unconditional Jumps (Base 27 / 28)
+    # Opcode 0x1B / 0x1C: Conditional Jumps (Base 27 / 28)
     # --------------------------------------------------------------------------
     if mnemonic in JMP_COND_MAP:
         subop = JMP_COND_MAP[mnemonic]

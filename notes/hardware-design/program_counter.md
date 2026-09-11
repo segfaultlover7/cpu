@@ -11,7 +11,8 @@ At reset, the PC loads the hardwired vector `0xC000`, which is the start of ROM
 
 The PC is built from four 74161 4-bit synchronous binary counters cascaded into a single 16-bit counter. The output of the PC is driven either onto the address bus, for normal fetching operations, or the data bus, for loading the PC into the RAM.
 
-<img src="../Attachments/pc_dig.png" alt="Program Counter ICs" width="800" />
+<img src="../Attachments/pc_dig.png" alt="Program Counter ICs" width="675" />
+
 ### Reset Circuit
 
 Initially the PC is outputting at address `0x0000`, meaning the address decoder is selecting the RAM. Since the ROM is not the one selected, it means the instruction register, and therefore the Control Unit's opcode is 0.
@@ -40,15 +41,16 @@ In this case, the `/OE` is the bit corresponding to the 74245 Tri-State buffer c
 
 ## Control Signals & Operations
 
-| Signal    | Active Level | Function                                                             |
-| --------- | ------------ | -------------------------------------------------------------------- |
-| `PC_INC`  | HIGH         | Enables incrementing on the 74161s                                   |
-| `nPC_LD`  | LOW          | Enables parallel load into the PC from address bus                   |
-| `PC_OE`   | *HIGH        | Drives the PC onto the address bus                                   |
-| `nPCL_OE` | LOW          | Enables parallel load into the PCL from data bus                     |
-| `nPCH_OE` | LOW          | Enables parallel load into the PCH from data bus                     |
-| `RST`     | HIGH         | Forces PC load from hardwired vector and disables address-bus output |
-_*note: the `PC_OE` is active LOW, but for the sake of convenience it's put as active high. It's done that way so that the microprogrammer doens't need to activate it on every "normal" instruction_
+| Signal    | Active Level | Function                                           |
+| --------- | ------------ | -------------------------------------------------- |
+| `PC_INC`  | HIGH         | Enables incrementing on the 74161s                 |
+| `nPC_LD`  | LOW          | Enables parallel load into the PC from address bus |
+| `PC_OE`   | *HIGH        | Drives the PC onto the address bus                 |
+| `nPCL_OE` | LOW          | Enables parallel load into the PCL from data bus   |
+| `nPCH_OE` | LOW          | Enables parallel load into the PCH from data bus   |
+| `RST`     | HIGH         | Forces PC load from vector and disables output     |
+
+_*note: the `PC_OE` is active LOW, but for the sake of convenience it's put as active high. It's done that way so that the microprogrammer doesn't need to activate it on every "normal" instruction_
 
 ### Operations
 

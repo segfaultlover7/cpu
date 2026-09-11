@@ -14,3 +14,6 @@ It's only job is to make sure that, when the address is on each address range, t
 
 <img src="../Attachments/adr_dec.png" alt="Address decoder" width="500" />
 
+
+
+![419](notes/Attachments/Pasted%20image%2020260911215024.png)

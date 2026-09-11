@@ -1,18 +1,7 @@
-; cpu test, start at 0xC000
-; start SP at 0x3FFF
-.main:
-  MOV X, 0x3F
-  MOV Y, 0xFF
-  MOV SP, XY
-  MOV MARL, 0x09
-  MOV MARH, 0xC0
-  CALL MAR
-  MOV X, 0x10
-  MOV Y, 0x10
+.ORG 0xC000
 
-  MOV A, 0x20
-  ADD A, 0x10
-  MOV B, A
-  RET
+MOV MARH, 0xBF
+MOV MARL, 0x00
+MOV A, 0xFF
 
-
+ST MAR, A

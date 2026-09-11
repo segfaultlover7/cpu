@@ -310,11 +310,12 @@ def gen_microcode():
                     if microstep == 1:
                         control_word |= (1 << ALU_S0)
                         control_word |= (1 << ALU_S1)
-                        control_word |= (1 << ALU_CIN)
                         control_word |= (1 << REG_OE)
                         control_word |= (1 << REG_LD)
                         control_word |= (1 << A_SEL)
                         control_word |= (1 << nFL_LD)
+                        if c_flag:
+                            control_word |= (1 << ALU_CIN)
                         control_word |= (1 << nMPC_RST)
 
                 if base_opcode == 15:  # SUB A, reg
@@ -334,6 +335,8 @@ def gen_microcode():
                         control_word |= (1 << REG_LD)
                         control_word |= (1 << A_SEL)
                         control_word |= (1 << nFL_LD)
+                        if c_flag:
+                            control_word |= (1 << ALU_CIN)
                         control_word |= (1 << nMPC_RST)
 
                 if base_opcode == 17:  # AND A, reg
@@ -423,30 +426,21 @@ def gen_microcode():
                         control_word |= (1 << nFL_LD)
                         control_word |= (1 << nMPC_RST)
 
-                if base_opcode == 27:  # JCC MAR # CORRECT THE FORMAT
+                if base_opcode == 27:  # JCC MAR
                     if microstep == 1:
-                        if sub_opcode == 0: # JZ (JMP if z)
+                        if take_jump:
                             control_word |= (1 << PC_OE)
                             control_word |= (1 << nPC_LD)
                             control_word |= (1 << nMAR_OE)
-                            control_word |= (1 << nMPC_RST)
+                        control_word |= (1 << nMPC_RST)
 
-                        if sub_opcode == 1: # JNZ (JMP if not z)
-                            control_word |= (1 << nMPC_RST)
-
-                        if sub_opcode == 7: # JMP
-                            control_word |= (1 << PC_OE)
-                            control_word |= (1 << nPC_LD)
-                            control_word |= (1 << nMAR_OE)
-                            control_word |= (1 << nMPC_RST)
-
-                if base_opcode == 28: # JCC XY
+                if base_opcode == 28:  # JCC XY
                     if microstep == 1:
-                        if sub_opcode == 7: # JMP
+                        if take_jump:
                             control_word |= (1 << PC_OE)
                             control_word |= (1 << nPC_LD)
                             control_word |= (1 << nXYA_OE)
-                            control_word |= (1 << nMPC_RST)
+                        control_word |= (1 << nMPC_RST)
 
                 if base_opcode == 29:  # Pointers arithmetic & indirect calls/jmps
                     if sub_opcode == 0: # INC XY
