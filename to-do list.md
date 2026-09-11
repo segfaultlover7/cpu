@@ -7,3 +7,4 @@
 - maybe divide pseudoinstructions in single-instruction or multi-instruction?
 - document about fetch-execute overlap and in which instructions in a new document called structural hazard.
 - (once most documentation is finished) change the folder system to have each module its own folder with the notes, images and its real hardware implementation, datasheets, etc.
+- update README.md

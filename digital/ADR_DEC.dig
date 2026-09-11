@@ -3,6 +3,15 @@
   <version>2</version>
   <attributes>
     <entry>
+      <string>backgroundColor</string>
+      <awt-color>
+        <red>0</red>
+        <green>204</green>
+        <blue>204</blue>
+        <alpha>255</alpha>
+      </awt-color>
+    </entry>
+    <entry>
       <string>romContent</string>
       <romList>
         <roms/>
@@ -11,15 +20,6 @@
     <entry>
       <string>Width</string>
       <int>7</int>
-    </entry>
-    <entry>
-      <string>backgroundColor</string>
-      <awt-color>
-        <red>0</red>
-        <green>204</green>
-        <blue>204</blue>
-        <alpha>255</alpha>
-      </awt-color>
     </entry>
   </attributes>
   <visualElements>
@@ -129,7 +129,7 @@
           <string>nRAM_CS</string>
         </entry>
       </elementAttributes>
-      <pos x="800" y="340"/>
+      <pos x="800" y="300"/>
     </visualElement>
     <visualElement>
       <elementName>Out</elementName>
@@ -139,7 +139,7 @@
           <string>nROM_CS</string>
         </entry>
       </elementAttributes>
-      <pos x="800" y="380"/>
+      <pos x="800" y="340"/>
     </visualElement>
     <visualElement>
       <elementName>Out</elementName>
@@ -149,7 +149,7 @@
           <string>nFB_CS</string>
         </entry>
       </elementAttributes>
-      <pos x="800" y="420"/>
+      <pos x="800" y="380"/>
     </visualElement>
     <visualElement>
       <elementName>Out</elementName>
@@ -159,7 +159,7 @@
           <string>nMMIO_CS</string>
         </entry>
       </elementAttributes>
-      <pos x="800" y="460"/>
+      <pos x="800" y="420"/>
     </visualElement>
     <visualElement>
       <elementName>Ground</elementName>
@@ -232,10 +232,6 @@
       <p2 x="100" y="460"/>
     </wire>
     <wire>
-      <p1 x="640" y="460"/>
-      <p2 x="800" y="460"/>
-    </wire>
-    <wire>
       <p1 x="80" y="-20"/>
       <p2 x="100" y="-20"/>
     </wire>
@@ -264,7 +260,7 @@
       <p2 x="540" y="340"/>
     </wire>
     <wire>
-      <p1 x="680" y="340"/>
+      <p1 x="700" y="340"/>
       <p2 x="800" y="340"/>
     </wire>
     <wire>
@@ -320,6 +316,18 @@
       <p2 x="400" y="-100"/>
     </wire>
     <wire>
+      <p1 x="640" y="420"/>
+      <p2 x="800" y="420"/>
+    </wire>
+    <wire>
+      <p1 x="220" y="420"/>
+      <p2 x="240" y="420"/>
+    </wire>
+    <wire>
+      <p1 x="20" y="420"/>
+      <p2 x="100" y="420"/>
+    </wire>
+    <wire>
       <p1 x="720" y="740"/>
       <p2 x="740" y="740"/>
     </wire>
@@ -336,16 +344,8 @@
       <p2 x="400" y="100"/>
     </wire>
     <wire>
-      <p1 x="220" y="420"/>
-      <p2 x="240" y="420"/>
-    </wire>
-    <wire>
-      <p1 x="20" y="420"/>
-      <p2 x="100" y="420"/>
-    </wire>
-    <wire>
-      <p1 x="660" y="420"/>
-      <p2 x="800" y="420"/>
+      <p1 x="680" y="300"/>
+      <p2 x="800" y="300"/>
     </wire>
     <wire>
       <p1 x="220" y="300"/>
@@ -416,7 +416,7 @@
       <p2 x="400" y="-60"/>
     </wire>
     <wire>
-      <p1 x="700" y="380"/>
+      <p1 x="660" y="380"/>
       <p2 x="800" y="380"/>
     </wire>
     <wire>
@@ -461,10 +461,10 @@
     </wire>
     <wire>
       <p1 x="640" y="220"/>
-      <p2 x="640" y="460"/>
+      <p2 x="640" y="420"/>
     </wire>
     <wire>
-      <p1 x="640" y="460"/>
+      <p1 x="640" y="420"/>
       <p2 x="640" y="580"/>
     </wire>
     <wire>
@@ -488,7 +488,7 @@
       <p2 x="360" y="220"/>
     </wire>
     <wire>
-      <p1 x="680" y="340"/>
+      <p1 x="680" y="300"/>
       <p2 x="680" y="660"/>
     </wire>
     <wire>
@@ -572,7 +572,7 @@
       <p2 x="-20" y="180"/>
     </wire>
     <wire>
-      <p1 x="660" y="420"/>
+      <p1 x="660" y="380"/>
       <p2 x="660" y="620"/>
     </wire>
     <wire>
@@ -592,7 +592,7 @@
       <p2 x="600" y="500"/>
     </wire>
     <wire>
-      <p1 x="700" y="380"/>
+      <p1 x="700" y="340"/>
       <p2 x="700" y="700"/>
     </wire>
     <wire>

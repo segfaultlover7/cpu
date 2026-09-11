@@ -703,8 +703,8 @@ def gen_microcode():
                             control_word |= (1 << nMPC_RST)
 
                     elif sub_opcode == 7: # HALT
-                        if microstep == 1: # NOT CONFIGURED YET (need a new control bit to stop the microprogram counter)
-                            pass
+                        if microstep == 1:
+                            control_word |= (1 << nMPC_RST) ## SHOULD BE DONE ON MICROSTEP 0
 
 
         f_control_word = control_word ^ active_low_mask
