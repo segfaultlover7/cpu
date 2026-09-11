@@ -29,14 +29,14 @@ The tri-state buffers connect the MAR to the address bus.
 | `MAR_DIR`  | HIGH         | Sets counter direction (LOW for `INC`, HIGH for `DEC`) |
 ### Operations
 
-| Operation                 | Signals triggered     | Cycles    |
-| ------------------------- | --------------------- | --------- |
-| MOV MARL, Imm/REG         | `nMARL_LD`            | 2         |
-| MOV MARH, Imm/REG         | `nMARH_LD`            | 2         |
-| LD REG, MAR / ST MAR, REG | `nMAR_OE`             | 2         |
-| JCC MAR / CALL MAR / RET  | `nMAR_OE`             | 2 / 4 / 5 |
-| INC MAR                   | `nMAR_INC`            | 2         |
-| DEC MAR                   | `nMAR_INC`, `MAR_DIR` | 2         |
+| Operation                 | Signals triggered     |
+| ------------------------- | --------------------- |
+| MOV MARL, Imm/REG         | `nMARL_LD`            |
+| MOV MARH, Imm/REG         | `nMARH_LD`            |
+| LD REG, MAR / ST MAR, REG | `nMAR_OE`             |
+| JCC MAR                   | `nMAR_OE`             |
+| INC MAR                   | `nMAR_INC`            |
+| DEC MAR                   | `nMAR_INC`, `MAR_DIR` |
 ## Timing, Latches & Critical Paths
 
 The MAR counters are synchronous and edge-triggered. Their outputs change only on the rising clock edge, after the counter propagation delay `t_pd`. This is the same principle as the Stack Pointer.

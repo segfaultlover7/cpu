@@ -16,4 +16,5 @@ The 74191's load input is active-low, so if I wanted to only load when the load 
 | 0        | 1   | 1      |
 | 1        | 0   | 1      |
 | 1        | 1   | 1      |
+
 So just an OR gate would solve this.
