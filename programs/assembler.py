@@ -64,48 +64,49 @@ def parse_val(val_str, symbol_table):
 # ==============================================================================
 
 def expand_pseudoinstructions(mnemonic, tokens):
-    if mnemonic in ["CALL", "CALLXY"]:
-        if mnemonic == "CALLXY":
-            target = tokens[0]
-            return [
-                ("MOV", ["X", f"LOW:{target}"]),
-                ("MOV", ["Y", f"HIGH:{target}"]),
-                ("CALL", ["XY"])
-            ]
-        
+    if mnemonic == "CALLXY":
+        target = tokens[0]
+        return [
+            ("MOV", ["X", f"LOW:{target}"]),
+            ("MOV", ["Y", f"HIGH:{target}"]),
+            ("CALL", ["XY"])
+        ]
+
+    # Direct CALL label -> Word 1: CALL MEM_HIGH, Word 2: CALL MEM_LOW
+    if mnemonic == "CALL":
         if len(tokens) == 1:
             target = tokens[0]
             if target in ["MAR", "XY"]:
                 return [(mnemonic, tokens)]
             else:
                 return [
-                    ("MOV", ["MARL", f"LOW:{target}"]),
-                    ("MOV", ["MARH", f"HIGH:{target}"]),
-                    ("CALL", ["MAR"])
-                ]
-        elif len(tokens) == 2:
-            ptr, target = tokens[0], tokens[1]
-            if ptr == "MAR":
-                return [
-                    ("MOV", ["MARL", f"LOW:{target}"]),
-                    ("MOV", ["MARH", f"HIGH:{target}"]),
-                    ("CALL", ["MAR"])
-                ]
-            elif ptr == "XY":
-                return [
-                    ("MOV", ["X", f"LOW:{target}"]),
-                    ("MOV", ["Y", f"HIGH:{target}"]),
-                    ("CALL", ["XY"])
+                    ("CALL", [f"HIGH:{target}"]),
+                    ("CALL", [f"LOW:{target}"])
                 ]
 
-    if mnemonic in JMP_COND_MAP or mnemonic == "JMP":
-        if len(tokens) == 1 and tokens[0] not in ["MAR", "XY"]:
+    # Direct JMP label -> Word 1: JMP MEM_HIGH, Word 2: JMP MEM_LOW
+    if mnemonic == "JMP":
+        if len(tokens) == 1:
             target = tokens[0]
-            return [
-                ("MOV", ["MARL", f"LOW:{target}"]),
-                ("MOV", ["MARH", f"HIGH:{target}"]),
-                (mnemonic, ["MAR"])
-            ]
+            if target in ["MAR", "XY"]:
+                return [(mnemonic, tokens)]
+            else:
+                return [
+                    ("JMP", [f"HIGH:{target}"]),
+                    ("JMP", [f"LOW:{target}"])
+                ]
+
+    # Direct JCC label -> Word 1: JCC MEM_HIGH, Word 2: JCC MEM_LOW
+    if mnemonic in JMP_COND_MAP:
+        if len(tokens) == 1:
+            target = tokens[0]
+            if target in ["MAR", "XY"]:
+                return [(mnemonic, tokens)]
+            else:
+                return [
+                    (mnemonic, [f"HIGH:{target}"]),
+                    (mnemonic, [f"LOW:{target}"])
+                ]
 
     return [(mnemonic, tokens)]
 
@@ -133,6 +134,7 @@ def encode_instruction(mnemonic, tokens, symbol_table):
     elif mnemonic == "DEC" and tokens[0] == "SP":
         return (0x1E << 11) | (0x4 << 8)
 
+    # Base Opcode 29 (0x1D): Register Indirect Pointer Operations
     if mnemonic == "INC" and tokens[0] == "XY":
         return (0x1D << 11) | (0x0 << 8)
     if mnemonic == "DEC" and tokens[0] == "XY":
@@ -152,13 +154,20 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         elif tokens[0] == "MAR":
             return (0x1D << 11) | (0x7 << 8)
 
+    # Base Opcode 27 (0x1B): Conditional Direct Jumps (8 Sub-opcodes)
     if mnemonic in JMP_COND_MAP:
         subop = JMP_COND_MAP[mnemonic]
-        target = tokens[0]
-        if target == "MAR":
-            return (0x1B << 11) | (subop << 8)
-        elif target == "XY":
-            return (0x1C << 11) | (subop << 8)
+        val = parse_val(tokens[0], symbol_table)
+        return (0x1B << 11) | (subop << 8) | (val & 0xFF)
+
+    # Base Opcode 28 (0x1C): Direct JMP (Subop 0) and Direct CALL (Subop 1)
+    if mnemonic == "JMP":
+        val = parse_val(tokens[0], symbol_table)
+        return (0x1C << 11) | (0x0 << 8) | (val & 0xFF)
+
+    if mnemonic == "CALL":
+        val = parse_val(tokens[0], symbol_table)
+        return (0x1C << 11) | (0x1 << 8) | (val & 0xFF)
 
     if mnemonic == "MOV" and tokens[0] in ["MARL", "MARH"]:
         bit_8 = 1 if tokens[0] == "MARH" else 0
@@ -260,7 +269,6 @@ def assemble(source_code, default_origin=0xC000):
                 current_address = parse_val(tokens[1], symbol_table)
                 continue
             
-            # 16-bit Word/Vector Directives: Splits target into LOW byte and HIGH byte
             if mnemonic in DIRECTIVES_WORD:
                 for token in tokens[1:]:
                     parsed_program.append({
@@ -278,7 +286,6 @@ def assemble(source_code, default_origin=0xC000):
                     current_address += 2
                 continue
 
-            # Standard 8-bit Byte Directives
             if mnemonic in DIRECTIVES_BYTE:
                 for token in tokens[1:]:
                     parsed_program.append({
@@ -290,7 +297,6 @@ def assemble(source_code, default_origin=0xC000):
                     current_address += 1
                 continue
             
-            # 16-bit Instructions (1 Word per instruction)
             expanded_ops = expand_pseudoinstructions(mnemonic, tokens[1:])
             for exp_mnemonic, exp_operands in expanded_ops:
                 parsed_program.append({

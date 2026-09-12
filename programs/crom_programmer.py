@@ -253,11 +253,26 @@ def gen_microcode():
                     if microstep == 1:
                         control_word |= (1 << ALU_S1) | (1 << ALU_CIN) | (1 << nIRD_OE) | (1 << nFL_LD) | (1 << nMPC_RST)
 
-                elif base_opcode == 27:  # JCC MAR
+                elif base_opcode == 27:  # JCC imm16
+                    take_jump = check_condition(sub_opcode, z_flag, c_flag, n_flag, v_flag)
+
                     if microstep == 1:
-                        if take_jump:
-                            control_word |= (1 << PC_OE) | (1 << nPC_LD) | (1 << nMAR_OE)
-                        control_word |= (1 << nMPC_RST)
+                        if take_jump: # load high byte into marh (and pc++ automatically)
+                            control_word |= (1 << nIRD_OE) | (1 << nMARH_LD)
+                        else: # Branch not taken: Skip Low Byte
+                            pass
+
+                    elif microstep == 2:
+                        if take_jump: # Read second word and store in Instruction Register
+                            control_word |= (1 << MEM_RD) | (1 << nIR_LD)
+                        else: # Branch not taken: Skip High Byte and finish instruction (3 cycles total)
+                             control_word |= (1 << PC_INC) | (1 << nMPC_RST)
+
+                    elif microstep == 3: # Load low byte into MARL and pc++
+                            control_word |= (1 << nIRD_OE) | (1 << nMARL_LD) | (1 << PC_INC)
+
+                    elif microstep == 4: # Load destination from MAR into PC
+                        control_word |= (1 << PC_OE) | (1 << nPC_LD) | (1 << nMAR_OE) | (1 << nMPC_RST)
 
                 elif base_opcode == 28:  # JCC XY
                     if microstep == 1:

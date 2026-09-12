@@ -1,25 +1,45 @@
-ORG 0xC000
+; ==============================================================================
+; Test Program: Direct Immediate Jumps & Interrupt Safety
+; ==============================================================================
 
-MOV MARL, 0xFF
-MOV MARH, 0x01
+.ORG 0xC000
 
-MOV SP, MAR
+START:
+    CLI                      ; Enable interrupts to allow IRQ testing
+    MOV A, 0x05              ; Initialize accumulator with 5
 
-MOV X, 0xBF
-MOV Y, 0x00
+    ; 1. Test Condition Fail (False Branch Fall-Through)
+    ; Sub-opcode 2 = JZ. Since A != 0, Z flag is 0. Condition fails.
+    ; Should skip the 2-byte operand (TARGET_FAIL) in 2 cycles and hit INC A.
+    JZ TARGET_FAIL           
 
-RESET_ENTRY:
-    SEI
-MAIN_LOOP:
-    JMP MAIN_LOOP
+    INC A                    ; Executed! A becomes 6.
 
-KEYBOARD_ISR:
-    LD A, XY
-    RETI
+    ; 2. Test Condition Pass (True Branch Jump)
+    ; Sub-opcode 2 = JZ. Compare A (6) with 6 -> sets Z flag = 1.
+    CP A, 0x06               
+    JZ TARGET_PASS           ; Condition met! Jumps directly to TARGET_PASS.
 
-; Vector space automatically splits targets into two zero-extended byte words
-ORG 0xFFF0
-    DW RESET_ENTRY
-    DW 0x0000
-    DW KEYBOARD_ISR
+    ; If JZ fails to jump, execution hits HALT (Test Failed)
+    HALT                     
 
+TARGET_FAIL:
+    ; Danger Zone: If JZ incorrectly jumps here on false, test halts.
+    HALT                     
+
+TARGET_PASS:
+    ; 3. Test Interrupt Hazard Safety
+    ; Load MAR with dummy data, then execute a 3-byte jump. 
+    ; Even if an IRQ hits mid-program, MAR will be safely overwritten 
+    ; by JZ's internal fetch steps without destroying previous state.
+    MOV MARL, 0xAA
+    MOV MARH, 0xBB
+
+    ; Sub-opcode 3 = JNZ. Since A is still 6, Z flag is 0 (A != 0).
+    ; JNZ condition is True -> Jumps to SUCCESS.
+    JNZ SUCCESS              
+
+    HALT                     
+
+SUCCESS:
+    HALT                     ; Test Passed! PC ends up here safely.
