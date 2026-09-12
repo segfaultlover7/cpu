@@ -2,7 +2,7 @@ import sys
 import os
 
 # ==============================================================================
-# HARDWARE DEFINITIONS & MAPS (ISA SPECIFIC)
+# HARDWARE DEFINITIONS & MAPS
 # ==============================================================================
 
 REGISTER_MAP = {
@@ -10,25 +10,26 @@ REGISTER_MAP = {
     "E": 4, "F": 5, "X": 6, "Y": 7
 }
 
-# Aligned with check_condition() in microcode generator (Base 27 / 28)
 JMP_COND_MAP = {
     "JC": 0, "JNC": 1, "JZ": 2, "JNZ": 3,
     "JN": 4, "JNN": 5, "JV": 6, "JNV": 7
 }
 
-# Aligned with Base Opcode 31 in microcode
 SYSTEM_OPS = {
     "BRK": 0, "RET": 1, "RTI": 2, "RETI": 2,
     "SEI": 3, "CLI": 4, "PUSHF": 5, "POPF": 6,
     "HALT": 7
 }
 
+DIRECTIVES_ORG  = [".ORG", "ORG"]
+DIRECTIVES_WORD = [".DW", "DW", ".WORD", "WORD", ".VEC", "VEC", ".VECTOR", "VECTOR"]
+DIRECTIVES_BYTE = [".DB", "DB", ".BYTE", "BYTE"]
+
 # ==============================================================================
 # TOKENIZER & PARSER HELPERS
 # ==============================================================================
 
 def clean_and_tokenize(raw_line):
-    """Strips comments, extracts labels, and normalizes tokens."""
     line = raw_line.split(';')[0].strip()
     if not line:
         return None, []
@@ -46,7 +47,6 @@ def clean_and_tokenize(raw_line):
     return label, tokens
 
 def parse_val(val_str, symbol_table):
-    """Parses immediate values, label addresses, and LOW/HIGH byte modifiers."""
     if val_str.startswith("LOW:"):
         return parse_val(val_str[4:], symbol_table) & 0xFF
     if val_str.startswith("HIGH:"):
@@ -64,12 +64,6 @@ def parse_val(val_str, symbol_table):
 # ==============================================================================
 
 def expand_pseudoinstructions(mnemonic, tokens):
-    """
-    Expands high-level pseudoinstructions into base ISA instructions.
-    - CALL label / CALL MAR, label -> MOV MARL + MOV MARH + CALL MAR
-    - CALL XY, label               -> MOV X + MOV Y + CALL XY
-    - Jcc label / JMP label        -> MOV MARL + MOV MARH + Jcc/JMP MAR
-    """
     if mnemonic in ["CALL", "CALLXY"]:
         if mnemonic == "CALLXY":
             target = tokens[0]
@@ -104,7 +98,6 @@ def expand_pseudoinstructions(mnemonic, tokens):
                     ("CALL", ["XY"])
                 ]
 
-    # Auto-expand conditional jumps and unconditional JMP to labels via MAR
     if mnemonic in JMP_COND_MAP or mnemonic == "JMP":
         if len(tokens) == 1 and tokens[0] not in ["MAR", "XY"]:
             target = tokens[0]
@@ -121,19 +114,9 @@ def expand_pseudoinstructions(mnemonic, tokens):
 # ==============================================================================
 
 def encode_instruction(mnemonic, tokens, symbol_table):
-    """
-    Encodes instructions according to the exact ISA table opcodes and subopcodes.
-    High Byte [15:8] holds the 8-bit IR opcode: (base_opcode << 3) | sub_opcode
-    """
-    # --------------------------------------------------------------------------
-    # Opcode 0x1F: System & Interrupt Instructions (Base 31)
-    # --------------------------------------------------------------------------
     if mnemonic in SYSTEM_OPS:
         return (0x1F << 11) | (SYSTEM_OPS[mnemonic] << 8)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x1E: Stack Pointer & Special Register Instructions (Base 30)
-    # --------------------------------------------------------------------------
     if mnemonic == "MOV":
         if tokens[0] == "SP" and tokens[1] == "MAR":
             return (0x1E << 11) | (0x0 << 8)
@@ -150,9 +133,6 @@ def encode_instruction(mnemonic, tokens, symbol_table):
     elif mnemonic == "DEC" and tokens[0] == "SP":
         return (0x1E << 11) | (0x4 << 8)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x1D: Pointer Operations, Hardware Calls & Unconditional JMPs (Base 29)
-    # --------------------------------------------------------------------------
     if mnemonic == "INC" and tokens[0] == "XY":
         return (0x1D << 11) | (0x0 << 8)
     if mnemonic == "DEC" and tokens[0] == "XY":
@@ -172,9 +152,6 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         elif tokens[0] == "MAR":
             return (0x1D << 11) | (0x7 << 8)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x1B / 0x1C: Conditional Jumps (Base 27 / 28)
-    # --------------------------------------------------------------------------
     if mnemonic in JMP_COND_MAP:
         subop = JMP_COND_MAP[mnemonic]
         target = tokens[0]
@@ -183,9 +160,6 @@ def encode_instruction(mnemonic, tokens, symbol_table):
         elif target == "XY":
             return (0x1C << 11) | (subop << 8)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x02 / 0x03: MOV MARL / MOV MARH (Base 2 / 3)
-    # --------------------------------------------------------------------------
     if mnemonic == "MOV" and tokens[0] in ["MARL", "MARH"]:
         bit_8 = 1 if tokens[0] == "MARH" else 0
         src = tokens[1]
@@ -195,9 +169,6 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             val = parse_val(src, symbol_table)
             return (0x02 << 11) | (bit_8 << 8) | (val & 0xFF)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x00 / 0x01: MOV Register Operations (Base 0 / 1)
-    # --------------------------------------------------------------------------
     if mnemonic == "MOV" and tokens[0] in REGISTER_MAP:
         r_dest = REGISTER_MAP[tokens[0]]
         src = tokens[1]
@@ -207,9 +178,6 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             val = parse_val(src, symbol_table)
             return (0x00 << 11) | (r_dest << 8) | (val & 0xFF)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x04 / 0x05 / 0x06: LD Register Operations (Base 4 / 5 / 6)
-    # --------------------------------------------------------------------------
     if mnemonic == "LD":
         r_dest = REGISTER_MAP[tokens[0]]
         src = tokens[1]
@@ -221,9 +189,6 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             val = parse_val(src, symbol_table)
             return (0x04 << 11) | (r_dest << 8) | (val & 0xFF)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x07 / 0x08 / 0x09: ST Memory Operations (Base 7 / 8 / 9)
-    # --------------------------------------------------------------------------
     if mnemonic == "ST":
         target = tokens[0]
         r_src = REGISTER_MAP[tokens[1]]
@@ -235,25 +200,16 @@ def encode_instruction(mnemonic, tokens, symbol_table):
             val = parse_val(target, symbol_table)
             return (0x07 << 11) | (r_src << 8) | (val & 0xFF)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x0A / 0x0B: PUSH & POP Operations (Base 10 / 11)
-    # --------------------------------------------------------------------------
     if mnemonic == "PUSH":
         return (0x0A << 11) | (REGISTER_MAP[tokens[0]] << 8)
     if mnemonic == "POP":
         return (0x0B << 11) | (REGISTER_MAP[tokens[0]] << 8)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x15 - 0x18: Unary Accumulator Operations (Base 21 - 24)
-    # --------------------------------------------------------------------------
     if mnemonic == "INC" and tokens[0] == "A": return (0x15 << 11)
     if mnemonic == "DEC" and tokens[0] == "A": return (0x16 << 11)
     if mnemonic == "SHR" and tokens[0] == "A": return (0x17 << 11)
     if mnemonic == "ROR" and tokens[0] == "A": return (0x18 << 11)
 
-    # --------------------------------------------------------------------------
-    # Opcode 0x0C - 0x14, 0x19 - 0x1A: ALU Operations (Base 12 - 20, 25 - 26)
-    # --------------------------------------------------------------------------
     alu_map = {
         "ADD": (0x0C, 0x0D),
         "ADC": (0x0E, None),
@@ -286,7 +242,7 @@ def assemble(source_code, default_origin=0xC000):
     parsed_program = []
     current_address = default_origin
 
-    # PASS 1: Build Symbol Table & Expand Pseudoinstructions
+    # PASS 1: Build Symbol Table & Word Allocations
     for line_num, raw_line in enumerate(lines, 1):
         label, tokens = clean_and_tokenize(raw_line)
         
@@ -300,36 +256,88 @@ def assemble(source_code, default_origin=0xC000):
         if tokens:
             mnemonic = tokens[0].upper()
             
-            if mnemonic == ".ORG":
+            if mnemonic in DIRECTIVES_ORG:
                 current_address = parse_val(tokens[1], symbol_table)
                 continue
             
-            expanded_ops = expand_pseudoinstructions(mnemonic, tokens[1:])
+            # 16-bit Word/Vector Directives: Splits target into LOW byte and HIGH byte
+            if mnemonic in DIRECTIVES_WORD:
+                for token in tokens[1:]:
+                    parsed_program.append({
+                        "line_num": line_num,
+                        "address": current_address,
+                        "type": "WORD_LOW",
+                        "val_str": token
+                    })
+                    parsed_program.append({
+                        "line_num": line_num,
+                        "address": current_address + 1,
+                        "type": "WORD_HIGH",
+                        "val_str": token
+                    })
+                    current_address += 2
+                continue
+
+            # Standard 8-bit Byte Directives
+            if mnemonic in DIRECTIVES_BYTE:
+                for token in tokens[1:]:
+                    parsed_program.append({
+                        "line_num": line_num,
+                        "address": current_address,
+                        "type": "DB",
+                        "val_str": token
+                    })
+                    current_address += 1
+                continue
             
+            # 16-bit Instructions (1 Word per instruction)
+            expanded_ops = expand_pseudoinstructions(mnemonic, tokens[1:])
             for exp_mnemonic, exp_operands in expanded_ops:
                 parsed_program.append({
                     "line_num": line_num,
                     "address": current_address,
+                    "type": "INST",
                     "mnemonic": exp_mnemonic,
                     "operands": exp_operands
                 })
                 current_address += 1
 
-    # PASS 2: Encode Machine Binary
+    # PASS 2: Encode Machine Words
     binary_words = []
     for item in parsed_program:
-        word = encode_instruction(item["mnemonic"], item["operands"], symbol_table)
+        itype = item["type"]
+        if itype == "WORD_LOW":
+            word = parse_val(item["val_str"], symbol_table) & 0xFF
+        elif itype == "WORD_HIGH":
+            word = (parse_val(item["val_str"], symbol_table) >> 8) & 0xFF
+        elif itype == "DB":
+            word = parse_val(item["val_str"], symbol_table) & 0xFF
+        else:
+            word = encode_instruction(item["mnemonic"], item["operands"], symbol_table)
+
         binary_words.append((item["address"], word))
 
     return symbol_table, binary_words
 
 # ==============================================================================
-# OUTPUT FORMATTER & CLI EXECUTION
+# OUTPUT FORMATTER (16-BIT RAW HEX FOR DIGITAL)
 # ==============================================================================
 
-def generate_digital_hex(binary_words):
+def generate_digital_hex(binary_words, rom_size=0x4000):
     header = "v2.0 raw\n"
-    lines = [f"{word:04X}" for _, word in binary_words]
+    rom_array = [0x0000] * rom_size
+
+    for addr, word in binary_words:
+        if 0xC000 <= addr <= 0xFFFF:
+            offset = addr - 0xC000
+        elif 0 <= addr < rom_size:
+            offset = addr
+        else:
+            raise ValueError(f"Address 0x{addr:04X} out of bounds!")
+
+        rom_array[offset] = word
+
+    lines = [f"{w:04X}" for w in rom_array]
     return header + "\n".join(lines)
 
 if __name__ == "__main__":
@@ -346,7 +354,7 @@ if __name__ == "__main__":
         print(f"Error: File '{asm_filepath}' not found.")
         sys.exit(1)
 
-    symbols, code = assemble(asm_code)
+    symbols, word_data = assemble(asm_code)
 
     print(f"--- Assembling {asm_filepath} ---")
     print("\n[Symbol Table]")
@@ -354,11 +362,11 @@ if __name__ == "__main__":
         if not sym.startswith('.'):
             print(f"  {sym:<12} -> 0x{addr:04X}")
 
-    print("\n[Assembled 16-Bit Word Addressing]")
-    for addr, word in code:
-        print(f"  0x{addr:04X}: 0x{word:04X}  ({word:016b})")
+    print("\n[Assembled Output]")
+    for addr, word in word_data:
+        print(f"  0x{addr:04X}: 0x{word:04X}")
 
-    hex_output = generate_digital_hex(code)
+    hex_output = generate_digital_hex(word_data)
     output_filepath = os.path.splitext(asm_filepath)[0] + ".hex"
     with open(output_filepath, 'w') as f:
         f.write(hex_output)
